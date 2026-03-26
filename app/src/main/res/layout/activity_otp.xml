@@ -1,0 +1,194 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@android:color/white">
+
+    <!-- Close button at top left -->
+    <ImageButton
+        android:id="@+id/btnClose"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_margin="16dp"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:contentDescription="Close Button"
+        android:src="@drawable/ic_close"
+        app:tint="@null" />
+
+    <!-- Security Note Above OTP Title -->
+
+    <!-- OTP Title -->
+    <TextView
+        android:id="@+id/tvSecurityNote"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_marginStart="40dp"
+        android:layout_marginTop="65dp"
+        android:layout_marginEnd="40dp"
+        android:background="@drawable/security_note_background"
+        android:padding="10dp"
+        android:text="App can redirect to external browser for reCAPTCHA"
+        android:textColor="#FF7F7F"
+        android:textSize="14sp" />
+
+    <TextView
+        android:id="@+id/tvOtpTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="120dp"
+        android:text="OTP Sent To"
+        android:textColor="#000000"
+        android:textSize="32sp"
+        android:textStyle="bold" />
+
+    <!-- Phone Number Display -->
+    <TextView
+        android:id="@+id/tvPhone"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/tvOtpTitle"
+        android:layout_centerHorizontal="true"
+        android:text="+92 **********"
+        android:textColor="#777777"
+        android:textSize="18sp" />
+
+    <!-- OTP Input Fields (6 Digits) -->
+    <LinearLayout
+        android:id="@+id/otpContainer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/tvPhone"
+        android:layout_marginStart="40dp"
+        android:layout_marginTop="40dp"
+        android:layout_marginEnd="40dp"
+        android:orientation="horizontal"
+        android:weightSum="6">
+
+        <EditText
+            android:id="@+id/etOtp1"
+            android:layout_width="0dp"
+            android:layout_height="70dp"
+            android:layout_weight="1"
+            android:background="@drawable/otp_box_background"
+            android:gravity="center"
+            android:hint="·"
+            android:inputType="number"
+            android:maxLength="1"
+            android:textColor="#000000"
+            android:textSize="24sp" />
+
+        <EditText
+            android:id="@+id/etOtp2"
+            android:layout_width="0dp"
+            android:layout_height="70dp"
+            android:layout_weight="1"
+            android:background="@drawable/otp_box_background"
+            android:gravity="center"
+            android:hint="·"
+            android:inputType="number"
+            android:maxLength="1"
+            android:textColor="#000000"
+            android:textSize="24sp" />
+
+        <EditText
+            android:id="@+id/etOtp3"
+            android:layout_width="0dp"
+            android:layout_height="70dp"
+            android:layout_weight="1"
+            android:background="@drawable/otp_box_background"
+            android:gravity="center"
+            android:hint="·"
+            android:inputType="number"
+            android:maxLength="1"
+            android:textColor="#000000"
+            android:textSize="24sp" />
+
+        <EditText
+            android:id="@+id/etOtp4"
+            android:layout_width="0dp"
+            android:layout_height="70dp"
+            android:layout_weight="1"
+            android:background="@drawable/otp_box_background"
+            android:gravity="center"
+            android:hint="·"
+            android:inputType="number"
+            android:maxLength="1"
+            android:textColor="#000000"
+            android:textSize="24sp" />
+
+        <EditText
+            android:id="@+id/etOtp5"
+            android:layout_width="0dp"
+            android:layout_height="70dp"
+            android:layout_weight="1"
+            android:background="@drawable/otp_box_background"
+            android:gravity="center"
+            android:hint="·"
+            android:inputType="number"
+            android:maxLength="1"
+            android:textColor="#000000"
+            android:textSize="24sp" />
+
+        <EditText
+            android:id="@+id/etOtp6"
+            android:layout_width="0dp"
+            android:layout_height="70dp"
+            android:layout_weight="1"
+            android:background="@drawable/otp_box_background"
+            android:gravity="center"
+            android:hint="·"
+            android:inputType="number"
+            android:maxLength="1"
+            android:textColor="#000000"
+            android:textSize="24sp" />
+    </LinearLayout>
+
+    <!-- Countdown Timer -->
+    <TextView
+        android:id="@+id/tvCountdown"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/otpContainer"
+        android:layout_centerHorizontal="true"
+        android:text="Wait 60s"
+        android:textColor="#FF7F6F"
+        android:textSize="18sp" />
+
+    <!-- Resend OTP Text -->
+    <TextView
+        android:id="@+id/tvResendOtp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/tvCountdown"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="10dp"
+        android:background="?attr/selectableItemBackground"
+        android:clickable="true"
+        android:focusable="true"
+        android:padding="10dp"
+        android:text="Resend OTP"
+        android:textColor="#FF7F6F"
+        android:textSize="18sp"
+        tools:ignore="TouchTargetSizeCheck" />
+
+
+    <!-- Submit Button -->
+    <Button
+        android:id="@+id/btnSubmit"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/tvResendOtp"
+        android:layout_marginStart="40dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginEnd="40dp"
+        android:background="@drawable/submit_button_background"
+        android:text="Submit"
+        android:textAllCaps="false"
+        android:textColor="#FFFFFF"
+        android:textSize="22sp" />
+
+</RelativeLayout>

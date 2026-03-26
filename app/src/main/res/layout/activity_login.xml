@@ -1,0 +1,228 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#F5F5F5"
+    tools:context=".LoginActivity">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingHorizontal="24dp"
+            android:paddingVertical="16dp">
+
+            <TextView
+                android:id="@+id/tvAppName"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="40dp"
+                android:gravity="center"
+                android:layout_gravity="center"
+                android:text="QuantumMine"
+                android:textColor="#000000"
+                android:textSize="28sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tvAppNameVault"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:text="Vault"
+                android:textColor="#FF7D59"
+                android:textSize="28sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tvRegisterHeader"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="40dp"
+                android:gravity="center"
+                android:text="Welcome"
+                android:textColor="#000000"
+                android:textSize="24sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tvSubHeader"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:gravity="center"
+                android:text="Please fill all the details to continue"
+                android:textColor="#757575"
+                android:textSize="16sp" />
+
+            <TextView
+                android:id="@+id/tvEmailLabel"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="32dp"
+                android:text="Email Id"
+                android:textColor="#000000"
+                android:textSize="16sp" />
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cvEmail"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="0dp"
+                app:strokeColor="#DDDDDD"
+                app:strokeWidth="1dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:paddingHorizontal="16dp">
+
+                    <ImageView
+                        android:id="@+id/ivNameIcon"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:layout_marginVertical="12dp"
+                        android:layout_marginEnd="12dp"
+                        android:contentDescription="Name icon"
+                        android:src="@drawable/ic_person"
+                        app:tint="#757575" />
+
+                    <EditText
+                        android:id="@+id/etEmail"
+                        android:layout_width="match_parent"
+                        android:layout_height="48dp"
+                        android:background="@null"
+                        android:hint="Enter your email"
+                        android:inputType="textEmailAddress"
+                        android:padding="12dp"
+                        android:textColor="#000000"
+                        android:textColorHint="#AAAAAA"
+                        android:textSize="16sp" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <TextView
+                android:id="@+id/tvPasswordLabel"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:text="Password"
+                android:textColor="#000000"
+                android:textSize="16sp" />
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cvPassword"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="0dp"
+                app:strokeColor="#DDDDDD"
+                app:strokeWidth="1dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:paddingHorizontal="16dp">
+
+                    <ImageView
+                        android:id="@+id/ivPasswordIcon"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:layout_marginVertical="12dp"
+                        android:layout_marginEnd="12dp"
+                        android:contentDescription="Password icon"
+                        android:src="@drawable/ic_lock"
+                        app:tint="@null" />
+
+                    <EditText
+                        android:id="@+id/etPassword"
+                        android:layout_width="0dp"
+                        android:layout_height="48dp"
+                        android:layout_weight="1"
+                        android:background="@null"
+                        android:hint="Enter your password"
+                        android:inputType="textPassword"
+                        android:padding="12dp"
+                        android:textColor="#000000"
+                        android:textColorHint="#AAAAAA"
+                        android:textSize="16sp" />
+                    <ImageView
+                        android:id="@+id/ivTogglePassword"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:contentDescription="Toggle password visibility"
+                        android:src="@drawable/ic_visibility_off"
+                        app:tint="#757575" />
+
+
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cvLoginButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="32dp"
+                app:cardBackgroundColor="#FF7D59"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="0dp">
+
+                <androidx.appcompat.widget.AppCompatButton
+                    android:id="@+id/btnLogin"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@android:color/transparent"
+                    android:paddingVertical="16dp"
+                    android:text="Login"
+                    android:textAllCaps="false"
+                    android:textColor="#FFFFFF"
+                    android:textSize="16sp" />
+            </com.google.android.material.card.MaterialCardView>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="24dp"
+                android:gravity="center"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/tvSignupPrompt"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Don't have an account yet?"
+                    android:textColor="#757575"
+                    android:textSize="14sp" />
+
+                <TextView
+                    android:id="@+id/tvSignup"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="4dp"
+                    android:text="Signup Now"
+                    android:textColor="#FF7D59"
+                    android:textSize="14sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+        </LinearLayout>
+    </ScrollView>
+</androidx.constraintlayout.widget.ConstraintLayout>

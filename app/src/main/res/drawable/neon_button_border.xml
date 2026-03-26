@@ -1,0 +1,11 @@
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="@android:color/transparent" />
+            <stroke
+                android:width="3dp"
+                android:color="#FF80B0" /> <!-- Neon Pink Border -->
+            <corners android:radius="25dp" />
+        </shape>
+    </item>
+</layer-list>

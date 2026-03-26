@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#000000">
+
+    <!-- LOTTIE ANIMATED BACKGROUND -->
+    <com.airbnb.lottie.LottieAnimationView
+        android:id="@+id/lottieBackground"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="centerCrop"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentStart="true"
+        app:lottie_rawRes="@raw/welcome_bg"
+        app:lottie_autoPlay="true"
+        app:lottie_loop="true" />
+
+    <!-- Logo Image -->
+    <ImageView
+        android:id="@+id/logoImage"
+        android:layout_width="200dp"
+        android:layout_height="200dp"
+        android:layout_centerInParent="true"
+        android:src="@mipmap/ic_launcher" />
+
+    <!-- Welcome Text -->
+    <TextView
+        android:id="@+id/welcomeText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Welcome to the QuantumMine Vault\nwhere you can mine blockchain crypto."
+        android:textColor="#00FFFF"
+        android:textStyle="bold"
+        android:textSize="18sp"
+        android:gravity="center"
+        android:layout_below="@id/logoImage"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="40dp"
+        android:visibility="gone" />
+
+
+    <!-- Start Button -->
+    <Button
+        android:id="@+id/startButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Let's Start →"
+        android:textColor="@color/neon_gradient_text"
+        android:textStyle="bold"
+        android:textSize="16sp"
+        android:background="@drawable/neon_button_border"
+        android:layout_below="@id/welcomeText"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="30dp"
+        android:padding="12dp"
+        android:elevation="8dp"
+        android:visibility="gone" />
+
+    <!-- Terms Text -->
+    <TextView
+        android:id="@+id/termsText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Terms and conditions applied."
+        android:textColor="#888888"
+        android:textSize="12sp"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="20dp"
+        android:visibility="gone" />
+
+</RelativeLayout>

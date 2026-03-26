@@ -1,0 +1,14 @@
+<resources>
+    <string name="app_name">QuantumMine Vault</string>
+    <string name="action_settings">Settings</string>
+    <string name="hello_world">Welcome to QuantumMine Vault!</string>
+    <string name="close_button">Close</string>
+    <string name="email_icon">Email</string>
+    <string name="edit_email">Edit Email</string>
+    <string name="otp_digit_1">First OTP digit</string>
+    <string name="otp_digit_2">Second OTP digit</string>
+    <string name="otp_digit_3">Third OTP digit</string>
+    <string name="otp_digit_4">Fourth OTP digit</string>
+    <string name="accessibility_description">Enable to start physical mining using your device.</string>
+
+</resources>

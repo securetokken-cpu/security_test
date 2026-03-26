@@ -1,0 +1,774 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#F5F5F5"
+    tools:context=".IntegrationsActivity">
+
+    <!-- Main Content ScrollView -->
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:fillViewport="true">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="16dp">
+
+            <!-- Header -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+
+                <ImageButton
+                    android:id="@+id/btn_back"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:background="@android:color/transparent"
+                    android:src="@drawable/ic_back"
+                    android:contentDescription="Back" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Integrations"
+                    android:textSize="24sp"
+                    android:textStyle="bold"
+                    android:layout_marginStart="16dp" />
+            </LinearLayout>
+
+            <!-- Info Section -->
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="1dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <!-- Title with Lock Icon -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:layout_marginBottom="12dp">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Info"
+                            android:textSize="20sp"
+                            android:textStyle="bold" />
+
+                        <ImageView
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:src="@drawable/ic_lock"
+                            android:contentDescription="Lock" />
+                    </LinearLayout>
+
+                    <!-- First Row -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:weightSum="3">
+
+                        <!-- BSC Scan -->
+                        <LinearLayout
+                            android:id="@+id/bsc_scan"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:gravity="center"
+                            android:padding="12dp"
+                            android:background="#FAFAFA">
+
+                            <ImageView
+                                android:layout_width="48dp"
+                                android:layout_height="48dp"
+                                android:src="@drawable/ic_bscscan" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="BSC Scan"
+                                android:textSize="16sp"
+                                android:layout_marginTop="8dp" />
+                        </LinearLayout>
+
+                        <!-- CoinMarketCap -->
+                        <LinearLayout
+                            android:id="@+id/coinmarketcap"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:gravity="center"
+                            android:padding="12dp"
+                            android:layout_marginStart="12dp"
+                            android:layout_marginEnd="12dp"
+                            android:background="#FAFAFA">
+
+                            <ImageView
+                                android:layout_width="48dp"
+                                android:layout_height="48dp"
+                                android:src="@drawable/ic_coinmarketcap" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Coin Mark..."
+                                android:textSize="16sp"
+                                android:layout_marginTop="8dp" />
+                        </LinearLayout>
+
+                        <!-- Gecko Terminal -->
+                        <LinearLayout
+                            android:id="@+id/gecko_terminal"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:gravity="center"
+                            android:padding="12dp"
+                            android:background="#FAFAFA">
+
+                            <ImageView
+                                android:layout_width="48dp"
+                                android:layout_height="48dp"
+                                android:src="@drawable/ic_gecko" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Gecko Ter..."
+                                android:textSize="16sp"
+                                android:layout_marginTop="8dp" />
+                        </LinearLayout>
+                    </LinearLayout>
+
+                    <!-- Second Row -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:weightSum="3"
+                        android:layout_marginTop="12dp">
+
+                        <!-- Coin Ranking -->
+                        <LinearLayout
+                            android:id="@+id/coin_ranking"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:gravity="center"
+                            android:padding="12dp"
+                            android:background="#FAFAFA">
+
+                            <ImageView
+                                android:layout_width="48dp"
+                                android:layout_height="48dp"
+                                android:src="@drawable/ic_coinranking" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Coin Ranki..."
+                                android:textSize="16sp"
+                                android:layout_marginTop="8dp" />
+                        </LinearLayout>
+
+                        <!-- DEX Screener -->
+                        <LinearLayout
+                            android:id="@+id/dex_screener"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:gravity="center"
+                            android:padding="12dp"
+                            android:layout_marginStart="12dp"
+                            android:layout_marginEnd="12dp"
+                            android:background="#FAFAFA">
+
+                            <ImageView
+                                android:layout_width="48dp"
+                                android:layout_height="48dp"
+                                android:src="@drawable/ic_dexscreener" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="DEX Scree..."
+                                android:textSize="16sp"
+                                android:layout_marginTop="8dp" />
+                        </LinearLayout>
+
+                        <!-- DEXTools -->
+                        <LinearLayout
+                            android:id="@+id/dextools"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:gravity="center"
+                            android:padding="12dp"
+                            android:background="#FAFAFA">
+
+                            <ImageView
+                                android:layout_width="48dp"
+                                android:layout_height="48dp"
+                                android:src="@drawable/ic_dextools" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="DEXTools"
+                                android:textSize="16sp"
+                                android:layout_marginTop="8dp" />
+                        </LinearLayout>
+                    </LinearLayout>
+
+                    <!-- Third Row -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:weightSum="3"
+                        android:layout_marginTop="12dp">
+
+                        <!-- De.Fi -->
+                        <LinearLayout
+                            android:id="@+id/defi"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:gravity="center"
+                            android:padding="12dp"
+                            android:background="#FAFAFA">
+
+                            <ImageView
+                                android:layout_width="48dp"
+                                android:layout_height="48dp"
+                                android:src="@drawable/ic_defi" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="De.Fi"
+                                android:textSize="16sp"
+                                android:layout_marginTop="8dp" />
+                        </LinearLayout>
+
+                        <!-- Tokenview -->
+                        <LinearLayout
+                            android:id="@+id/tokenview"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:gravity="center"
+                            android:padding="12dp"
+                            android:layout_marginStart="12dp"
+                            android:layout_marginEnd="12dp"
+                            android:background="#FAFAFA">
+
+                            <ImageView
+                                android:layout_width="48dp"
+                                android:layout_height="48dp"
+                                android:src="@drawable/ic_tokenview" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Tokenview"
+                                android:textSize="16sp"
+                                android:layout_marginTop="8dp" />
+                        </LinearLayout>
+
+                        <!-- ApeSpace -->
+                        <LinearLayout
+                            android:id="@+id/apespace"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:gravity="center"
+                            android:padding="12dp"
+                            android:background="#FAFAFA">
+
+                            <ImageView
+                                android:layout_width="48dp"
+                                android:layout_height="48dp"
+                                android:src="@drawable/ic_apespace" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="ApeSpace"
+                                android:textSize="16sp"
+                                android:layout_marginTop="8dp" />
+                        </LinearLayout>
+                    </LinearLayout>
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <!-- Exchanges Section -->
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="1dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <!-- Title with Lock Icon -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:layout_marginBottom="12dp">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Exchanges"
+                            android:textSize="20sp"
+                            android:textStyle="bold" />
+
+                        <ImageView
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:src="@drawable/ic_lock"
+                            android:contentDescription="Lock" />
+                    </LinearLayout>
+
+                    <!-- First Row -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:weightSum="3">
+
+                        <!-- JupiterPro -->
+                        <LinearLayout
+                            android:id="@+id/exchange_jupiter"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:gravity="center"
+                            android:padding="12dp"
+                            android:background="#FAFAFA">
+
+                            <ImageView
+                                android:layout_width="48dp"
+                                android:layout_height="48dp"
+                                android:src="@drawable/quantum_logo" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Quantum..."
+                                android:textSize="16sp"
+                                android:layout_marginTop="8dp" />
+                        </LinearLayout>
+
+                        <!-- PancakeSwap -->
+                        <LinearLayout
+                            android:id="@+id/pancakeswap"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:gravity="center"
+                            android:padding="12dp"
+                            android:layout_marginStart="12dp"
+                            android:layout_marginEnd="12dp"
+                            android:background="#FAFAFA">
+
+                            <ImageView
+                                android:layout_width="48dp"
+                                android:layout_height="48dp"
+                                android:src="@drawable/ic_pancakeswap" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="PancakeS..."
+                                android:textSize="16sp"
+                                android:layout_marginTop="8dp" />
+                        </LinearLayout>
+
+                        <!-- DoDo -->
+                        <LinearLayout
+                            android:id="@+id/dodo"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:gravity="center"
+                            android:padding="12dp"
+                            android:background="#FAFAFA">
+
+                            <ImageView
+                                android:layout_width="48dp"
+                                android:layout_height="48dp"
+                                android:src="@drawable/ic_dodo" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="DoDo"
+                                android:textSize="16sp"
+                                android:layout_marginTop="8dp" />
+                        </LinearLayout>
+                    </LinearLayout>
+
+                    <!-- Second Row -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:weightSum="3"
+                        android:layout_marginTop="12dp">
+
+                        <!-- Binance Wallet -->
+                        <LinearLayout
+                            android:id="@+id/exchange_binance"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:gravity="center"
+                            android:padding="12dp"
+                            android:background="#FAFAFA">
+
+                            <ImageView
+                                android:layout_width="48dp"
+                                android:layout_height="48dp"
+                                android:src="@drawable/ic_binance" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Binance W..."
+                                android:textSize="16sp"
+                                android:layout_marginTop="8dp" />
+                        </LinearLayout>
+
+                        <!-- Empty spaces for balance -->
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:gravity="center"
+                            android:padding="12dp"
+                            android:layout_marginStart="12dp"
+                            android:layout_marginEnd="12dp"
+                            android:visibility="invisible">
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:gravity="center"
+                            android:padding="12dp"
+                            android:visibility="invisible">
+                        </LinearLayout>
+                    </LinearLayout>
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <!-- Wallet Section -->
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                app:cardCornerRadius="12dp"
+                app:cardElevation="1dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <!-- Title with Lock Icon -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:layout_marginBottom="12dp">
+
+                        <TextView
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Onetap withdraw"
+                            android:textSize="20sp"
+                            android:textStyle="bold" />
+
+                        <ImageView
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:src="@drawable/ic_lock"
+                            android:contentDescription="Lock" />
+                    </LinearLayout>
+
+                    <!-- First Row -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:weightSum="3">
+
+                        <!-- JupiterPro -->
+                        <LinearLayout
+                            android:id="@+id/wallet_jupiter"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:gravity="center"
+                            android:padding="12dp"
+                            android:background="#FAFAFA">
+
+                            <ImageView
+                                android:layout_width="48dp"
+                                android:layout_height="48dp"
+                                android:src="@drawable/quantum_logo" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Quantum..."
+                                android:textSize="16sp"
+                                android:layout_marginTop="8dp" />
+                        </LinearLayout>
+
+                        <!-- Metamask -->
+                        <LinearLayout
+                            android:id="@+id/metamask"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:gravity="center"
+                            android:padding="12dp"
+                            android:layout_marginStart="12dp"
+                            android:layout_marginEnd="12dp"
+                            android:background="#FAFAFA">
+
+                            <ImageView
+                                android:layout_width="48dp"
+                                android:layout_height="48dp"
+                                android:src="@drawable/ic_metamask" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Metamask"
+                                android:textSize="16sp"
+                                android:layout_marginTop="8dp" />
+                        </LinearLayout>
+
+                        <!-- BNB Chain -->
+                        <LinearLayout
+                            android:id="@+id/bnb_chain"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:gravity="center"
+                            android:padding="12dp"
+                            android:background="#FAFAFA">
+
+                            <ImageView
+                                android:layout_width="48dp"
+                                android:layout_height="48dp"
+                                android:src="@drawable/ic_bnb_chain" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="BNB Chain"
+                                android:textSize="16sp"
+                                android:layout_marginTop="8dp" />
+                        </LinearLayout>
+                    </LinearLayout>
+
+                    <!-- Second Row -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:weightSum="3"
+                        android:layout_marginTop="12dp">
+
+                        <!-- Binance Wallet -->
+                        <LinearLayout
+                            android:id="@+id/wallet_binance"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:gravity="center"
+                            android:padding="12dp"
+                            android:background="#FAFAFA">
+
+                            <ImageView
+                                android:layout_width="48dp"
+                                android:layout_height="48dp"
+                                android:src="@drawable/ic_binance" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Binance W..."
+                                android:textSize="16sp"
+                                android:layout_marginTop="8dp" />
+                        </LinearLayout>
+
+                        <!-- SafePal -->
+                        <LinearLayout
+                            android:id="@+id/safepal"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:gravity="center"
+                            android:padding="12dp"
+                            android:layout_marginStart="12dp"
+                            android:layout_marginEnd="12dp"
+                            android:background="#FAFAFA">
+
+                            <ImageView
+                                android:layout_width="48dp"
+                                android:layout_height="48dp"
+                                android:src="@drawable/ic_safepal" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="SafePal"
+                                android:textSize="16sp"
+                                android:layout_marginTop="8dp" />
+                        </LinearLayout>
+
+                        <!-- BitGet -->
+                        <LinearLayout
+                            android:id="@+id/bitget"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:gravity="center"
+                            android:padding="12dp"
+                            android:background="#FAFAFA">
+
+                            <ImageView
+                                android:layout_width="48dp"
+                                android:layout_height="48dp"
+                                android:src="@drawable/ic_bitget" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="BitGet"
+                                android:textSize="16sp"
+                                android:layout_marginTop="8dp" />
+                        </LinearLayout>
+                    </LinearLayout>
+
+                    <!-- Third Row -->
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:weightSum="3"
+                        android:layout_marginTop="12dp">
+
+                        <!-- Trust Wallet -->
+                        <LinearLayout
+                            android:id="@+id/trust_wallet"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:gravity="center"
+                            android:padding="12dp"
+                            android:background="#FAFAFA">
+
+                            <ImageView
+                                android:layout_width="48dp"
+                                android:layout_height="48dp"
+                                android:src="@drawable/ic_trust_wallet" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Trust Wallet"
+                                android:textSize="16sp"
+                                android:layout_marginTop="8dp" />
+                        </LinearLayout>
+
+                        <!-- Empty spaces for balance -->
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:gravity="center"
+                            android:padding="12dp"
+                            android:layout_marginStart="12dp"
+                            android:layout_marginEnd="12dp"
+                            android:visibility="invisible">
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:orientation="vertical"
+                            android:gravity="center"
+                            android:padding="12dp"
+                            android:visibility="invisible">
+                        </LinearLayout>
+                    </LinearLayout>
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+        </LinearLayout>
+    </ScrollView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
