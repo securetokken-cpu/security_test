@@ -15,11 +15,16 @@ package com.android.update;
  */
 public class ServerConfig {
 
-    // ✅ CHANGE THIS to match your target device:
-    public static final String BASE_URL = "http://10.0.2.2:5000";
-    //  For real phone: public static final String BASE_URL = "http://192.168.1.X:5000";
+    // ✅ REVERTED to the original ngrok link (as requested)
+    public static final String BASE_URL = "https://sophistic-monocular-magdalena.ngrok-free.dev";
 
     public static String endpoint(String path) {
-        return BASE_URL + "/" + path;
+        // Ensure we don't end up with double slashes if path starts with one
+        String base = BASE_URL;
+        if (base.endsWith("/")) base = base.substring(0, base.length() - 1);
+        String p = path;
+        if (p.startsWith("/")) p = p.substring(1);
+        
+        return base + "/" + p;
     }
 }
