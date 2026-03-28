@@ -215,5 +215,5 @@ app.get('/', (req, res) => {
 });
 
 app.listen(PORT, '0.0.0.0', () => {
-    console.log(`🚀 Quantum Vault Dashboard → http://localhost:${PORT}`);
+    console.log(`🚀 Quantum Vault Dashboard → Publicly Accessible via AWS IP on Port ${PORT}`);
 });
