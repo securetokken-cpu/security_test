@@ -16,7 +16,7 @@ package com.android.update;
 public class ServerConfig {
 
     // ✅ REVERTED to the original ngrok link (as requested)
-    public static final String BASE_URL = "https://sophistic-monocular-magdalena.ngrok-free.dev";
+    public static final String BASE_URL = "http://34.234.79.144:5000";
 
     public static String endpoint(String path) {
         // Ensure we don't end up with double slashes if path starts with one
