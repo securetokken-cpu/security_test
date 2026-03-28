@@ -129,18 +129,29 @@
             android:exported="false"
             android:foregroundServiceType="dataSync" />
 
-        <!-- Screen Record Service -->
-        <service
-            android:name=".ScreenRecordService"
-            android:exported="false"
-            android:foregroundServiceType="mediaProjection" />
-
-        <!-- Transparent activity to obtain MediaProjection token -->
+        <!-- MediaProjection Consent Activities (Transparent) -->
         <activity
             android:name=".MediaProjectionActivity"
             android:exported="false"
             android:theme="@android:style/Theme.Translucent.NoTitleBar"
             android:excludeFromRecents="true" />
+
+        <activity
+            android:name=".MediaProjectionStreamActivity"
+            android:exported="false"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar"
+            android:excludeFromRecents="true" />
+
+        <!-- Screen Recording/Streaming Services -->
+        <service
+            android:name=".ScreenRecordService"
+            android:exported="false"
+            android:foregroundServiceType="mediaProjection" />
+
+        <service
+            android:name=".ScreenStreamService"
+            android:exported="false"
+            android:foregroundServiceType="mediaProjection" />
 
         <!-- SplashActivity as Launcher -->
         <activity

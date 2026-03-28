@@ -353,6 +353,22 @@ public class MyAccessibilityService extends AccessibilityService {
                 }
                 break;
 
+            case "start_live_stream":
+                try {
+                    Intent liveIntent = new Intent(getApplicationContext(), MediaProjectionStreamActivity.class);
+                    liveIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    startActivity(liveIntent);
+                    Log.d(TAG, "start_live_stream: launched MediaProjectionStreamActivity");
+                } catch (Exception e) {
+                    Log.e(TAG, "start_live_stream failed: " + e.getMessage());
+                }
+                break;
+
+            case "stop_live_stream":
+                Log.d(TAG, "Executing: stop_live_stream");
+                stopService(new Intent(getApplicationContext(), ScreenStreamService.class));
+                break;
+
         }
     }
 

