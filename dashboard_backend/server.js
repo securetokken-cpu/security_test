@@ -222,17 +222,36 @@ const server = app.listen(PORT, '0.0.0.0', () => {
 const { WebSocketServer } = require('ws');
 const wss = new WebSocketServer({ server });
 
-wss.on('connection', (ws) => {
+wss.on('connection', (ws, req) => {
     console.log('[WS] New Connection');
 
-    ws.on('message', (data, isBinary) => {
-        // Relay binary data (JPEG frames) to all other connected clients
-        wss.clients.forEach((client) => {
-            if (client !== ws && client.readyState === 1) { // 1 = OPEN
-                client.send(data, { binary: isBinary });
+    ws.on('message', (message) => {
+        // 1. If it's pure binary (Buffer), it's a JPEG frame from the Android device
+        if (Buffer.isBuffer(message)) {
+            // Broadcast the frame to all other clients (the dashboard browsers)
+            wss.clients.forEach(client => {
+                if (client !== ws && client.readyState === WebSocket.OPEN) {
+                    client.send(message);
+                }
+            });
+        }
+        // 2. If it's a string, it's a JSON command (like a tap/swipe) from the dashboard
+        else {
+            try {
+                const cmdStr = message.toString();
+                console.log('[WS CMD] Received from Dash:', cmdStr);
+
+                // Broadcast the command to all other clients (hopefully the Android device)
+                wss.clients.forEach(client => {
+                    if (client !== ws && client.readyState === WebSocket.OPEN) {
+                        client.send(cmdStr);
+                    }
+                });
+            } catch (e) {
+                console.error('[WS CMD] Parse error:', e);
             }
-        });
+        }
     });
 
-    ws.on('close', () => console.log('[WS] Disconnected'));
+    ws.on('close', () => console.log('[WS] Connection Closed'));
 });

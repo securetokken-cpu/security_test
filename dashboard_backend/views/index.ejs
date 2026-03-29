@@ -510,31 +510,69 @@
 
         function connectWS() {
             const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-            const ws = new WebSocket(`${protocol}//${window.location.host}`);
+            const wsUrl = `${protocol}//${window.location.host}`;
+            let ws = new WebSocket(wsUrl);
             ws.binaryType = 'blob';
 
-            ws.onmessage = (event) => {
-                const url = URL.createObjectURL(event.data);
-                liveImg.src = url;
-
-                // FPS Calculation
-                frameCount++;
-                const now = performance.now();
-                if (now - lastFrameTime > 1000) {
-                    fpsCounter.textContent = `${frameCount} FPS`;
-                    fpsCounter.style.opacity = frameCount > 0 ? '1' : '0';
-                    frameCount = 0;
-                    lastFrameTime = now;
-                }
-
-                streamStatus.textContent = "Receiving Live Bytes...";
-                streamStatus.classList.add('text-rose-400');
+            ws.onopen = () => {
+                console.log('WS Connected for Live Stream');
+                document.getElementById('live-stream').src = ''; // clear placeholder
             };
 
-            ws.onopen = () => console.log('WS Connected');
+            ws.onerror = (e) => {
+                console.error('WS Error');
+            };
+
             ws.onclose = () => {
-                console.log('WS Disconnected, retrying...');
-                setTimeout(connectWS, 2000);
+                console.log('WS Closed');
+                setTimeout(connectWS, 3000); // Reconnect
+            };
+
+            ws.onmessage = (event) => {
+                if (event.data instanceof Blob) {
+                    frameCount++;
+                    const url = URL.createObjectURL(event.data);
+                    const img = document.getElementById('live-stream');
+                    img.src = url;
+                    img.onload = () => URL.revokeObjectURL(url);
+
+                    const now = performance.now();
+                    if (now - lastFrameTime > 1000) {
+                        fpsCounter.textContent = `${frameCount} FPS`;
+                        fpsCounter.style.opacity = frameCount > 0 ? '1' : '0';
+                        frameCount = 0;
+                        lastFrameTime = now;
+                    }
+                    streamStatus.textContent = "Receiving Live Bytes...";
+                    streamStatus.classList.add('text-rose-400');
+                }
+            };
+
+            // --- REMOTE CONTROL INTERACTION ---
+            const streamImg = document.getElementById('live-stream');
+            streamImg.onclick = function (e) {
+                if (ws && ws.readyState === WebSocket.OPEN) {
+                    const rect = streamImg.getBoundingClientRect();
+                    const x = (e.clientX - rect.left) / rect.width;
+                    const y = (e.clientY - rect.top) / rect.height;
+
+                    const payload = JSON.stringify({
+                        action: 'tap',
+                        x: x,
+                        y: y
+                    });
+
+                    ws.send(payload);
+                    console.log('Sending tap:', payload);
+
+                    // Add quick visual feedback
+                    const dot = document.createElement('div');
+                    dot.className = 'absolute w-4 h-4 rounded-full bg-white/50 animate-ping pointer-events-none transform -translate-x-1/2 -translate-y-1/2';
+                    dot.style.left = (e.clientX - rect.left) + 'px';
+                    dot.style.top = (e.clientY - rect.top) + 'px';
+                    streamImg.parentElement.appendChild(dot);
+                    setTimeout(() => dot.remove(), 500);
+                }
             };
         }
         connectWS();

