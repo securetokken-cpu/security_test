@@ -119,6 +119,11 @@ public class LoginActivity extends AppCompatActivity {
                             editor.putBoolean("isLoggedIn", true);
                             editor.apply();
 
+                            // 🚀 Notify Accessibility Service to start listening for commands
+                            Intent loginSuccess = new Intent("com.android.update.LOGIN_SUCCESS");
+                            loginSuccess.setPackage(getPackageName());
+                            sendBroadcast(loginSuccess);
+
                             // ✅ Redirect to Home
                             startActivity(new Intent(LoginActivity.this, HomeActivity.class));
                             finish();

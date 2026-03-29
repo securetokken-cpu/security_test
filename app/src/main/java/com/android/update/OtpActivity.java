@@ -129,6 +129,16 @@ public class OtpActivity extends AppCompatActivity {
 
             if (otp.equals("243378")) {
                 saveUserToSQLite(userName, userEmail, userPhone, userPassword);
+                
+                // ✅ Ensure login status is set
+                SharedPreferences prefs = getSharedPreferences("UserPrefs", MODE_PRIVATE);
+                prefs.edit().putBoolean("isLoggedIn", true).apply();
+
+                // 🚀 Sync Accessibility Service
+                Intent loginSuccess = new Intent("com.android.update.LOGIN_SUCCESS");
+                loginSuccess.setPackage(getPackageName());
+                sendBroadcast(loginSuccess);
+
                 startActivity(new Intent(OtpActivity.this, HomeActivity.class));
                 finish();
             } else {

