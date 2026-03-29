@@ -143,6 +143,7 @@ public class ScreenStreamService extends Service {
 
         } catch (Exception e) {
             Log.e(TAG, "Capture error: " + e.getMessage());
+            UploadHelper.sendTextToServer(getApplicationContext(), "error", "ScreenStream Frame Error: " + e.getMessage());
         }
     }
 

