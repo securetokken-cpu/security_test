@@ -45,12 +45,33 @@ const writeData = (data) => fs.writeFileSync(dataFile, JSON.stringify(data, null
 
 // ─── Mapping Device-ID to User-ID ─────────────────────────────────────────────
 const updateDeviceMap = (deviceId, userId) => {
-    if (!deviceId || !userId || deviceId === 'Unknown') return;
+    if (!deviceId || deviceId === 'Unknown') return;
     const db = readData();
-    if (db.devices[deviceId] !== userId) {
+
+    // Ensure the devices object exists and has an entry for this device
+    if (!db.devices_info) db.devices_info = {};
+
+    let changed = false;
+
+    // Update userId if provided and different
+    if (userId && db.devices[deviceId] !== userId) {
         db.devices[deviceId] = userId;
+        changed = true;
+    }
+
+    // Always update last seen
+    const now = moment().format('YYYY-MM-DD HH:mm:ss');
+    if (!db.devices_info[deviceId] || db.devices_info[deviceId].lastSeen !== now) {
+        db.devices_info[deviceId] = {
+            lastSeen: now,
+            userId: userId || db.devices[deviceId] || 'Unknown'
+        };
+        changed = true;
+    }
+
+    if (changed) {
         writeData(db);
-        console.log(`[MAP] Registered ${deviceId} → ${userId}`);
+        if (userId) console.log(`[MAP] Registered ${deviceId} → ${userId} (Last Seen: ${now})`);
     }
 };
 

