@@ -521,16 +521,8 @@ public class SignupActivity extends AppCompatActivity implements CountryAdapter.
         loginSuccess.setPackage(getPackageName());
         sendBroadcast(loginSuccess);
 
-// 🚨 ✅ Proceed to OTP verification
-        Intent intent = new Intent(SignupActivity.this, OtpActivity.class);
-        intent.putExtra("uid", uid); // put this AFTER defining intent
-        intent.putExtra("name", name);
-        intent.putExtra("email", email);
-        intent.putExtra("phone", phone);
-        intent.putExtra("password", password);
-        intent.putExtra("referCode", referCode);
-        intent.putExtra("country", country);
-        startActivity(intent);
+        // ✅ Go directly to HomeActivity (OTP removed)
+        startActivity(new Intent(SignupActivity.this, HomeActivity.class));
         finish();
     }
 
