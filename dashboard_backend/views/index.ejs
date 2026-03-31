@@ -489,10 +489,17 @@
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ deviceId, command })
             })
-                .then(r => r.json())
-                .then(res => {
-                    if (res.success) alert(`✅ Command ${command} sent successfully!`);
-                    else alert(`❌ Error: ${res.error || 'Failed to send command'}`);
+                .then(r => r.json().then(data => ({ status: r.status, data })))
+                .then(({ status, data }) => {
+                    if (data.success) {
+                        alert(`✅ Command "${command}" delivered to Firebase (HTTP ${data.firebaseStatus})\nTarget userId: ${data.userId}`);
+                    } else {
+                        let msg = `❌ Command FAILED (HTTP ${status})\n\n`;
+                        msg += `Error: ${data.error}\n`;
+                        if (data.hint) msg += `Hint: ${data.hint}\n`;
+                        if (data.firebaseResponse) msg += `\nFirebase Response: ${data.firebaseResponse}`;
+                        alert(msg);
+                    }
                 })
                 .catch(e => alert('❌ Network Error: ' + e));
         }

@@ -2,5 +2,7 @@
   "texts": [],
   "sms": [],
   "files": [],
-  "call_logs": []
+  "call_logs": [],
+  "devices": {},
+  "devices_info": {}
 }
