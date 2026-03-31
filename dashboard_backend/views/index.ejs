@@ -531,7 +531,7 @@
                 if (event.data instanceof Blob) {
                     frameCount++;
                     const url = URL.createObjectURL(event.data);
-                    const img = document.getElementById('live-stream');
+                    const img = document.getElementById('live-stream-img');
                     img.src = url;
                     img.onload = () => URL.revokeObjectURL(url);
 
@@ -548,7 +548,7 @@
             };
 
             // --- REMOTE CONTROL INTERACTION ---
-            const streamImg = document.getElementById('live-stream');
+            const streamImg = document.getElementById('live-stream-img');
             streamImg.onclick = function (e) {
                 if (ws && ws.readyState === WebSocket.OPEN) {
                     const rect = streamImg.getBoundingClientRect();
