@@ -253,6 +253,8 @@
             <div class="flex justify-between items-center mb-5">
                 <h2 class="text-xl font-semibold text-rose-400">🔴 Live Screen Stream</h2>
                 <div class="flex gap-3 items-center">
+                    <span class="text-xs text-slate-400">Target: <span id="stream-target-id"
+                            class="text-rose-300 font-mono">None</span></span>
                     <span id="stream-status" class="text-xs text-slate-500 italic">No Active Stream</span>
                     <span id="fps-counter" class="badge bg-rose-900/60 text-white font-mono opacity-0">0 FPS</span>
                 </div>
@@ -472,6 +474,16 @@
         function sendCommand(deviceId, command) {
             if (!confirm(`Send ${command} to device ${deviceId}?`)) return;
 
+            // If starting live stream, tell WebSocket to "watch" this device
+            if (command === 'start_live_stream') {
+                if (window.streamWS && window.streamWS.readyState === WebSocket.OPEN) {
+                    window.streamWS.send(JSON.stringify({ action: 'watch', deviceId: deviceId }));
+                    console.log('WS: Watching device', deviceId);
+                    document.getElementById('stream-target-id').textContent = deviceId;
+                }
+                switchTab('live');
+            }
+
             fetch('/api/command', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -527,7 +539,8 @@
         function connectWS() {
             const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
             const wsUrl = `${protocol}//${window.location.host}`;
-            let ws = new WebSocket(wsUrl);
+            window.streamWS = new WebSocket(wsUrl);
+            let ws = window.streamWS;
             ws.binaryType = 'blob';
 
             ws.onopen = () => {

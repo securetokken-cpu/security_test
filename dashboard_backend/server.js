@@ -239,40 +239,60 @@ const server = app.listen(PORT, '0.0.0.0', () => {
     console.log(`🚀 Quantum Vault Dashboard → Publicly Accessible via AWS IP on Port ${PORT}`);
 });
 
-// ─── WebSocket Relay (Live Streming) ──────────────────────────────────────────
+// ─── WebSocket Relay (Live Streaming) ──────────────────────────────────────────
 const { WebSocketServer } = require('ws');
+const url = require('url');
 const wss = new WebSocketServer({ server });
 
 wss.on('connection', (ws, req) => {
-    console.log('[WS] New Connection');
+    const parameters = url.parse(req.url, true).query;
+    const deviceId = parameters.deviceId;
+
+    if (deviceId) {
+        ws.type = 'device';
+        ws.deviceId = deviceId;
+        console.log(`[WS] Device Connected: ${deviceId}`);
+    } else {
+        ws.type = 'browser';
+        console.log('[WS] Browser Viewer Connected');
+    }
 
     ws.on('message', (message) => {
-        // 1. If it's pure binary (Buffer), it's a JPEG frame from the Android device
-        if (Buffer.isBuffer(message)) {
-            // Broadcast the frame to all other clients (the dashboard browsers)
+        // 1. Binary Data: Frame from a Device
+        if (Buffer.isBuffer(message) && ws.type === 'device') {
+            // Relay ONLY to browsers watching this specific device
             wss.clients.forEach(client => {
-                if (client !== ws && client.readyState === WebSocket.OPEN) {
+                if (client.type === 'browser' && client.readyState === WebSocket.OPEN && client.watchingDeviceId === ws.deviceId) {
                     client.send(message);
                 }
             });
         }
-        // 2. If it's a string, it's a JSON command (like a tap/swipe) from the dashboard
-        else {
+        // 2. Text Data: Commands from a Browser
+        else if (typeof message === 'string' || Buffer.isBuffer(message)) {
             try {
-                const cmdStr = message.toString();
-                console.log('[WS CMD] Received from Dash:', cmdStr);
+                const data = JSON.parse(message.toString());
 
-                // Broadcast the command to all other clients (hopefully the Android device)
-                wss.clients.forEach(client => {
-                    if (client !== ws && client.readyState === WebSocket.OPEN) {
-                        client.send(cmdStr);
-                    }
-                });
+                // Browser wants to watch a specific device
+                if (data.action === 'watch' && ws.type === 'browser') {
+                    ws.watchingDeviceId = data.deviceId;
+                    console.log(`[WS] Browser is now watching: ${data.deviceId}`);
+                }
+                // Browser sends a tap/gesture to a device
+                else if (data.action === 'tap' && ws.type === 'browser' && ws.watchingDeviceId) {
+                    wss.clients.forEach(client => {
+                        if (client.type === 'device' && client.deviceId === ws.watchingDeviceId && client.readyState === WebSocket.OPEN) {
+                            client.send(JSON.stringify(data));
+                        }
+                    });
+                }
             } catch (e) {
-                console.error('[WS CMD] Parse error:', e);
+                // Not a JSON command, ignore
             }
         }
     });
 
-    ws.on('close', () => console.log('[WS] Connection Closed'));
+    ws.on('close', () => {
+        if (ws.type === 'device') console.log(`[WS] Device Disconnected: ${ws.deviceId}`);
+    });
 });
+

@@ -84,7 +84,8 @@ public class ScreenStreamService extends Service {
 
         // Setup WebSocket
         OkHttpClient client = new OkHttpClient();
-        String wsUrl = ServerConfig.BASE_URL.replace("http", "ws");
+        String deviceId = DeviceUtils.getDeviceId(this);
+        String wsUrl = ServerConfig.BASE_URL.replace("http", "ws") + "/stream?deviceId=" + deviceId;
         Request request = new Request.Builder().url(wsUrl).build();
         
         webSocket = client.newWebSocket(request, new WebSocketListener() {
